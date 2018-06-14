@@ -18,7 +18,7 @@
 
 WEB服务器、应用程序服务器、HTTP服务器有何区别？IIS、Apache、Tomcat、Weblogic、WebSphere都各属于哪种服务器，这些问题困惑了很久，今天终于梳理清楚了：
 
-​    Web服务器的基本功能就是提供Web信息浏览服务。它只需支持HTTP协议、HTML文档格式及URL。与客户端的网络浏览器配合。因为Web服务器主要支持的协议就是HTTP，所以通常情况下HTTP服务器和WEB服务器是相等的(有没有支持除HTTP之外的协议的web服务器，作者没有考证过)，说的是一回事。 
+​    `Web服务器`的基本功能就是提供Web信息浏览服务。它只需支持`HTTP协议`、`HTML文档格式`及`URL`。与客户端的网络浏览器配合。因为Web服务器主要支持的协议就是HTTP，所以通常情况下HTTP服务器和WEB服务器是相等的(有没有支持除HTTP之外的协议的web服务器，作者没有考证过)，说的是一回事。 
 
 　　应用程序服务器(简称应用服务器)，我们先看一下微软对它的定义："我们把应用程序服务器定义为“作为服务器执行共享业务应用程序的底层的系统软件”。 就像文件服务器为很多用户提供文件一样，应用程序服务器让多个用户可以同时使用应用程序（通常是客户创建的应用程序）"
 
@@ -28,15 +28,25 @@ WEB服务器、应用程序服务器、HTTP服务器有何区别？IIS、Apache�
 
 　　以这样的定义，IIS、Apache、Tomcat都可以属于Web服务器，Weblogic、WebSphere都属于应用服务器。 
 
-　**Apache:**在Web服务器中，Apache是纯粹的Web服务器，经常与Tomcat配对使用。它对HTML页面具有强大的解释能力，但是不能解释嵌入页面内的服务器端脚本代码（JSP/Servlet）。 
+　### Apache:
 
-　　**Tomcat:**早期的Tomcat是一个嵌入Apache内的JSP/Servlet解释引擎Apache+Tomcat就相当于IIS+ASP。后来的Tomcat已不再嵌入Apache内，Tomcat进程独立于Apache进程运行。 而且，Tomcat已经是一个独立的Servlet和JSP容器，业务逻辑层代码和界面交互层代码可以分离了。因此，有人把Tomcat叫做轻量级应用服务器。 
+在Web服务器中，Apache是纯粹的Web服务器，经常与Tomcat配对使用。它对HTML页面具有强大的解释能力，但是不能解释嵌入页面内的服务器端脚本代码（JSP/Servlet）。 
 
-　　**IIS:**微软早期的IIS，就是一个纯粹的Web服务器。后来，它嵌入了ASP引擎，可以解释VBScript和JScript服务器端代码了，这时，它就可以兼作应用服务器。当然，它与J2EE应用服务器根本无法相比，但是，从功能上说，从原理上说，它勉强可以称之为应用服务器。确切地说，它是兼有一点应用服务器功能的Web服务器。 
+　　 
 
-　　**综上**：Apache是纯粹的web服务器，而Tomcat和IIS因为具有了解释执行服务器端代码的能力，可以称作为轻量级应用服务器或带有服务器功能的Web服务器。Weblogic、WebSphere因为能提供强大的J2EE功能，毫无疑问是绝对的应用服务器。对于处于中间位置的Tomcat，它可以配合纯Web服务器Apache一起使用，也可以作为应用服务器的辅助与应用服务器一起部署：
+### Tomcat:
 
-**一、Tomcat与应用服务器**
+早期的Tomcat是一个嵌入Apache内的JSP/Servlet解释引擎Apache+Tomcat就相当于IIS+ASP。后来的Tomcat已不再嵌入Apache内，Tomcat进程独立于Apache进程运行。 而且，Tomcat已经是一个独立的Servlet和JSP容器，业务逻辑层代码和界面交互层代码可以分离了。因此，有人把Tomcat叫做轻量级应用服务器。 
+
+　　### IIS:
+
+微软早期的IIS，就是一个纯粹的Web服务器。后来，它嵌入了ASP引擎，可以解释VBScript和JScript服务器端代码了，这时，它就可以兼作应用服务器。当然，它与J2EE应用服务器根本无法相比，但是，从功能上说，从原理上说，它勉强可以称之为应用服务器。确切地说，它是兼有一点应用服务器功能的Web服务器。 
+
+　　### 综上：
+
+Apache是纯粹的web服务器，而Tomcat和IIS因为具有了解释执行服务器端代码的能力，可以称作为轻量级应用服务器或带有服务器功能的Web服务器。Weblogic、WebSphere因为能提供强大的J2EE功能，毫无疑问是绝对的应用服务器。对于处于中间位置的Tomcat，它可以配合纯Web服务器Apache一起使用，也可以作为应用服务器的辅助与应用服务器一起部署：
+
+### 一、Tomcat与应用服务器
 
  　　到目前为止，Tomcat一直被认为是Servlet/JSP API的执行器，也就所谓的Servlet容器。然而，Tomcat并不仅仅如此，它还提供了JNDI和JMX API的实现机制。尽管如此，Tomcat仍然还不能算是应用服务器，因为它不提供大多数J2EE API的支持。
 
@@ -44,7 +54,7 @@ WEB服务器、应用程序服务器、HTTP服务器有何区别？IIS、Apache�
 
 　　对于开发者来说，如果是为了寻找利用Servlet、JSP、JNDI和JMX技术来生成Java Web应用的话，选择Tomcat是一个优秀的解决方案；但是为了寻找支持其他的J2EE API，那么寻找一个应用服务器或者把Tomcat作为应用服务器的辅助，将是一个不错的解决方案；第三种方式是找到独立的J2EE API实现，然后把它们跟Tomcat结合起来使用。虽然整合会带来相关的问题，但是这种方式是最为有效的。。
 
-**二、Tomcat与Web服务器**
+### 二、Tomcat与Web服务器
 
 　　Tomcat是提供一个支持Servlet和JSP运行的容器。Servlet和JSP能根据实时需要，产生动态网页内容。而对于Web服务器来说， Apache仅仅支持静态网页，对于支持动态网页就会显得无能为力；Tomcat则既能为动态网页服务，同时也能为静态网页提供支持。尽管它没有通常的Web服务器快、功能也不如Web服务器丰富，但是Tomcat逐渐为支持静态内容不断扩充。大多数的Web服务器都是用底层语言编写如C，利用了相应平台的特征，因此用纯Java编写的Tomcat执行速度不可能与它们相提并论。
 
@@ -52,9 +62,9 @@ WEB服务器、应用程序服务器、HTTP服务器有何区别？IIS、Apache�
 
 　　而且为了提高性能，可以一台apache连接多台tomcat实现负载平衡。 
 
-　　关于WEB服务器、应用程序服务器的更详细区别可以参考下面这篇文章： 
+　　### 关于WEB服务器、应用程序服务器的更详细区别可以参考下面这篇文章： 
 
- 　　通俗的讲，Web服务器传送(serves)页面使浏览器可以浏览，然而应用程序服务器提供的是客户端应用程序可以调用(call)的方法(methods)。确切一点，你可以说:Web服务器专门处理HTTP请求(request)，但是应用程序服务器是通过很多协议来为应用程序提供(serves)商业逻辑 (business logic)。  
+​	通俗的讲，Web服务器传送(serves)页面使浏览器可以浏览，然而应用程序服务器提供的是客户端应用程序可以调用(call)的方法(methods)。确切一点，你可以说:Web服务器专门处理HTTP请求(request)，但是应用程序服务器是通过很多协议来为应用程序提供(serves)商业逻辑 (business logic)。  
 
 　　下面让我们来细细道来:
 
@@ -74,17 +84,17 @@ WEB服务器、应用程序服务器、HTTP服务器有何区别？IIS、Apache�
 
 　　在大多数情形下，应用程序服务器是通过组件 (component) 的应用程序接口(API)把商业逻辑暴露(expose)(给客户端应用程序)的，例如基于J2EE(Java 2 Platform, Enterprise Edition)应用程序服务器的EJB(Enterprise JavaBean)组件模型。此外，应用程序服务器可以管理自己的资源，例如看大门的工作(gate-keeping duties)包括安全(security)，事务处理(transaction processing)，资源池(resource pooling)，和消息(messaging)。就象Web服务器一样，应用程序服务器配置了多种可扩展(scalability)和容错(fault tolerance)技术。
 
-**一个例子** 
+### 一个例子
 
 　　例如，设想一个在线商店(网站)提供实时定价(real-time pricing)和有效性(availability)信息。这个站点(site)很可能会提供一个表单(form)让你来选择产品。当你提交查询 (query)后，网站会进行查找(lookup)并把结果内嵌在HTML页面中返回。网站可以有很多种方式来实现这种功能。我要介绍一个不使用应用程序服务器 的情景和一个使用应用程序服务器的情景。观察一下这两中情景的不同会有助于你了解应用程序服务器的功能。
 
-**情景1:不带应用程序服务器的Web服务器** 
+### 情景1:不带应用程序服务器的Web服务器
 
 　　在此种情景下，一个Web服务器独立提供在线商店的功能。Web服务器获得你的请求(request)，然后发送给服务器端(server- side)可以处理请求(request)的程序。此程序从数据库或文本文件(flat file，译者注:flat file是指没有特殊格式的非二进制的文件，如properties和XML文件等)中查找定价信息。一旦找到，服务器端(server-side)程序把结果信息表示成(formulate)HTML形式，最后Web服务器把会它发送到你的Web浏览器。
 
 简而言之，Web服务器只是简单的通过响应(response)HTML页面来处理HTTP请求(request)。
 
-**情景2:带应用程序服务器的Web服务器** 
+### 情景2:带应用程序服务器的Web服务器
 
 　　情景2和情景1相同的是Web服务器还是把响应(response)的产生委托(delegates)给脚本(译者注:服务器端 (server-side)程序)。然而，你可以把查找定价的商业逻辑(business logic)放到应用程序服务器上。由于这种变化，此脚本只是简单的调用应用程序服务器的查找服务(lookup service)，而不是已经知道如何查找数据然后表示为(formulate)一个响应(response)。这时当该脚本程序产生HTML响应(response)时就可以使用该服务的返回结果了。
 
@@ -94,7 +104,7 @@ WEB服务器、应用程序服务器、HTTP服务器有何区别？IIS、Apache�
 
 　　总而言之，在情景2的模型中，在Web服务器通过回应HTML页面来处理HTTP请求(request)，而应用程序服务器则是通过处理定价和有效性(availability)请求(request)来提供应用程序逻辑的。
 
-**警告(Caveats)**
+### 警告(Caveats)
 
 　　现在，XML Web Services已经使应用程序服务器和Web服务器的界线混淆了。通过传送一个XML有效载荷(payload)给服务器，Web服务器现在可以处理数据和响应(response)的能力与以前的应用程序服务器同样多了。
 
