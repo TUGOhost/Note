@@ -335,3 +335,72 @@ class Solution {
 }
 ```
 
+## 求众数
+
+### 题目描述
+
+给定一个大小为 *n* 的数组，找到其中的众数。众数是指在数组中出现次数**大于** `⌊ n/2 ⌋` 的元素。
+
+你可以假设数组是非空的，并且给定的数组总是存在众数。
+
+**示例 1:**
+
+```
+输入: [3,2,3]
+输出: 3
+```
+
+**示例 2:** 
+
+```
+输入: [2,2,1,1,1,2,2]
+输出: 2
+```
+
+### 分析
+
+众数的定义，题目已经给出，要解决的问题是，如何让计算机知道数组中相同元素出现的次数。
+
+思路一：
+
+众数出现次数大于n/2，然后对数组排序，取中间的元素
+
+思路二（百度得来）：
+
+利用哈希表的映射，储存数组中的数字以及它们出现的次数，当众数出现时，返回这个数字。 
+
+![](image/90.png)
+
+根据思路一，先对数组排序，然后取中间元素，结果超时，虽然答案对了，但是时间超过，这也不符合。
+
+### 贴出来代码
+
+```java
+
+//思路二
+class Solution {
+    public int majorityElement(int[] nums) {
+               
+        Map<Integer,Integer> map = new HashMap<Integer,Integer>(); 
+        int n = nums.length;
+        
+        for(int num : nums)   //统计每个元素出现的次数
+        {
+            Integer count = map.get(num);
+            if(count == null) 
+                count =1;
+            else
+                count++;
+            map.put(num,count);
+            
+            if(map.get(num) > n/2)
+                return num;
+        }
+        
+        return 0;
+    }
+}
+```
+
+
+
