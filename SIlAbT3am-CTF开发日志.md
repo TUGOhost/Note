@@ -164,3 +164,11 @@ Shiro
 
 ---
 
+在pom.xml中
+
+![](image/91.png)
+
+这个是下载jdbc驱动的。所以本地还是需要有postgresql的，emm感觉还是先把postgresql学一下吧。
+
+## 第二天
+
