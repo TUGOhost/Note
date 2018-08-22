@@ -66,7 +66,7 @@ JavaMail对收发邮件进行了高级的抽象，形成了一些关键的的接
 
 ### Properties：属性对象
 
-由于JavaMail需要和邮件服务器进行通信，这就要求程序提供许多诸如服务器地址、端口、用户名、密码等信息，JavaMail通过Properties对象封装这些属性西信息。如下面的代码封装了两个属性信息：
+由于JavaMail需要和邮件服务器进行通信，这就要求程序提供许多诸如服务器地址、端口、用户名、密码等信息，JavaMail通过Properties对象封装这些属性信息。如下面的代码封装了两个属性信息：
 
 ```java
 Properties props = new Properties();
@@ -95,7 +95,7 @@ props.put("mail.smtp.auth", "true");
 Session是一个很容易被误解的类，这归咎于混淆视听的类名。千万不要以为这里的Session像HttpSession一样代表真实的交互会话，但创建Session对象时，并没有对应的物理连接，它只不过是一对配置信息的集合。Session的主要作用包括两个方面：
 
     1. 接收各种配置属性信息：通过Properties对象设置的属性信息；
-
+    
     2. 初始化JavaMail环境：根据JavaMail的配置文件，初始化JavaMail环境，以便通过Session对象创建其他重要类的实例。
 
  所以，如果把Session更名为Configure也许更容易理解一些。JavaMail提供者在Jar包的META-INF目录下，通过以下文件提供了基本配置信息，以便session能够根据这个配置文件加载提供者的实现类：
@@ -121,11 +121,11 @@ protocol=pop3s; type=store; sun.mail.pop3.POP3SSLStore; vendor=Sun Microsystems,
 这个配置文件提供了以下四个方面的信息：
 
        protocol：协议名称；
-
+    
        type：协议类型；
-
+    
        class：对应该操作类型的实现类；
-
+    
        vendor：厂商名称。
 
 Session在加载配置文件时会按照以下优先级顺序进行：
@@ -461,17 +461,17 @@ for (int i=0, n=message.length; i<n; i++) {
 消息的删除涉及使用与消息相关的 Flags（标志）。不同 flag 对应不同的状态，有些由系统定义而有些则由用户定义。下面列出在内部类 Flags.Flag 中预定义的标志：
 
     *** Flags.Flag.ANSWERED**
-
+    
     *** Flags.Flag.DELETED**
-
+    
     *** Flags.Flag.DRAFT**
-
+    
     *** Flags.Flag.FLAGGED**
-
+    
     *** Flags.Flag.RECENT**
-
+    
     *** Flags.Flag.SEEN**
-
+    
     *** Flags.Flag.USER**
 
 仅仅因为存在一个标志，并不意味着所有邮件服务器或供应商都支持这个标志。例如，除了删除消息标志外，POP 协议不再支持其它任何标志。检查是否存在新邮件，这不是个 POP 任务，而是内建于邮件客户机的任务。为找出哪些标志能被支持，可以用 **getPermanentFlags()** 向 folder 提出要求。
