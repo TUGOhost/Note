@@ -450,3 +450,101 @@ class Solution {
 }
 ```
 
+# 杨辉三角
+
+### 题目描述
+
+给定一个非负整数 *numRows，*生成杨辉三角的前 *numRows* 行。
+
+![](image/1.gif)
+
+在杨辉三角中，每个数是它左上方和右上方的数的和。
+
+**示例:**
+
+```
+输入: 5
+输出:
+[
+     [1],
+    [1,1],
+   [1,2,1],
+  [1,3,3,1],
+ [1,4,6,4,1]
+]
+```
+
+### 分析
+
+
+
+根据上面那个图，我们可以发现，第一行和第二行都由1组成。其他行的起始和结束都是1.内容由上一行相邻两个数组和组成。由此我们可以写出代码。
+
+### 贴出代码
+
+```java
+class Solution {
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> res = new ArrayList<List<Integer>>();
+        
+        if(numRows == 0) 
+        	return res;
+        
+        for(int j = 0;j<numRows;j++) {
+        	List<Integer> row = new ArrayList<Integer>();
+        	row.add(1);
+        	
+        for(int i = 1;i<j;i++) {
+        	List<Integer> prevRow = res.get(j-1);
+        	int temp = prevRow.get(i-1)+prevRow.get(i);
+        	row.add(temp);
+        }
+        
+        if(j!=0)
+        	row.add(1);
+        res.add(row);
+        }
+        return res;
+    }
+}
+```
+
+# 杨辉三角 II
+
+### 题目描述
+
+给定一个非负索引 *k*，其中 *k* ≤ 33，返回杨辉三角的第 *k* 行。
+
+![](image/2.gif)
+
+在杨辉三角中，每个数是它左上方和右上方的数的和。
+
+**示例:**
+
+```
+输入: 3
+输出: [1,3,3,1]
+```
+
+### 贴出代码
+
+```java
+class Solution {
+    public List<Integer> getRow(int rowIndex) {
+        List<Integer> list = new ArrayList<>();
+        if(rowIndex < 0)
+        	return list;
+        list.add(1);
+        if(rowIndex == 0)
+        	return list;
+        for(int i = 1;i<=rowIndex;i++) {
+        	for(int j = list.size()-1;j>0;j--) {
+        		list.set(j, list.get(j-1)+list.get(j));
+        	}
+        	list.add(1);
+        }
+        return list;
+    }
+}
+```
+
