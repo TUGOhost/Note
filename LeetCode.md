@@ -675,3 +675,106 @@ public void rotate2(int[] nums, int k) {
 }
 ```
 
+# 存在重复元素
+
+### 题目描述
+
+给定一个整数数组，判断是否存在重复元素。
+
+如果任何值在数组中出现至少两次，函数返回 true。如果数组中每个元素都不相同，则返回 false。
+
+**示例 1:**
+
+```
+输入: [1,2,3,1]
+输出: true
+```
+
+**示例 2:**
+
+```
+输入: [1,2,3,4]
+输出: false
+```
+
+**示例 3:**
+
+```
+输入: [1,1,1,3,3,4,3,2,4,2]
+输出: true
+```
+
+### 分析
+
+这是一道很简单的题，只需要遍历数组就可以，而且不用全部依次遍历，简单点的方法就是先对数组排完序，然后依次对比是否相等。
+
+### 贴出代码
+
+```java
+class Solution {
+    public boolean containsDuplicate(int[] nums) {
+        Arrays.sort(nums);
+		for(int i = 0; i < nums.length-1; i++) {
+			if(nums[i] == nums[i+1]) {
+				return true;
+			}
+		}
+		return false;
+    }
+}
+```
+
+# 存在重复元素 II
+
+### 题目描述
+
+给定一个整数数组和一个整数 *k*，判断数组中是否存在两个不同的索引 *i* 和 *j*，使得 **nums [i] = nums [j]**，并且 *i* 和 *j* 的差的绝对值最大为 *k*。
+
+**示例 1:**
+
+```
+输入: nums = [1,2,3,1], k = 3
+输出: true
+```
+
+**示例 2:**
+
+```
+输入: nums = [1,0,1,1], k = 1
+输出: true
+```
+
+**示例 3:**
+
+```
+输入: nums = [1,2,3,1,2,3], k = 2
+输出: false
+```
+
+### 分析
+
+利用HashMap数据结构，每次存入数值钱先看一下有没有这个数了，如果已经有了，那么看一下这两个数的索引下标之差是不是小于等于k的，如果是的话那么久说明找到了，返回true，如果没有找到就返回false。
+
+### 贴出代码
+
+```java
+class Solution {
+    public boolean containsNearbyDuplicate(int[] nums, int k) {
+        HashMap<Integer,Integer> hm = new HashMap<>();
+		for(int i = 0; i < nums.length; i++) {
+			if(hm.containsKey(nums[i])) {
+				int sub = i - hm.get(nums[i]);
+				if(sub <= k) 
+					return true;
+				else 
+					hm.put(nums[i], i);
+		
+			}else 
+				hm.put(nums[i], i);
+		
+		}
+        	return false;
+    }	
+}
+```
+
