@@ -865,3 +865,90 @@ class Solution {
 }
 ```
 
+# 第三大的数
+
+### 题目描述
+
+给定一个非空数组，返回此数组中第三大的数。如果不存在，则返回数组中最大的数。要求算法时间复杂度必须是O(n)。
+
+**示例 1:**
+
+```
+输入: [3, 2, 1]
+
+输出: 1
+
+解释: 第三大的数是 1.
+```
+
+**示例 2:**
+
+```
+输入: [1, 2]
+
+输出: 2
+
+解释: 第三大的数不存在, 所以返回最大的数 2 .
+```
+
+**示例 3:**
+
+```
+输入: [2, 2, 3, 1]
+
+输出: 1
+
+解释: 注意，要求返回第三大的数，是指第三大且唯一出现的数。
+存在两个值为2的数，它们都排第二。
+```
+
+### 分析
+
+道题让我们求数组中第三大的数，如果不存在的话那么就返回最大的数，题目中说明了这里的第三大不能和第二大相同，必须是严格的小于，而并非小于等于。这道题并不是很难，如果知道怎么求第二大的数，那么求第三大的数的思路都是一样的。那么我们用三个变量first,
+second, third来分别保存第一大，第二大，和第三大的数，然后我们遍历数组，如果遍历到的数字大于当前第一大的数first，那么三个变量各自错位赋值，如果当前数字大于second，小于first，那么就更新second和third，如果当前数字大于third，小于second，那就只更新third。重复元引发结果有差异，如何解决？——引进变量fi，每有重复元fi–，如果最后fi小于3，那么说明没有第三大的数。 但是出现一个新的问题，如果有一个元素为Integer.MIN_VALUE，那么方法仍旧会有错。解决思路是设置一个标志量，只在第一次出现这个Integer.MIN_VALUE时，不处理fi–，后面的照常。
+
+### 贴出代码
+
+```java
+class Solution {
+    public int thirdMax(int[] nums) {
+     if(nums == null || nums.length == 0)
+			return -1;
+		if(nums.length == 1) {
+			return nums[0];
+		}
+		if(nums.length == 2) {
+			return Math.max(nums[0], nums[1]);
+		}
+		int len = nums.length;
+		int first = Integer.MIN_VALUE;
+		int second = Integer.MIN_VALUE;
+		int third = Integer.MIN_VALUE;
+		boolean fi = false;
+		for(int num : nums) {
+			if(num == Integer.MIN_VALUE && !fi) {
+				fi = true;
+				continue;
+			}
+			if(num == first || num == second || num == third) {
+				len --;
+				continue;
+			}
+			if(num > first) {
+				third = second;
+				second = first;
+				first = num;
+				continue;
+			}else if(num > second) {
+				third = second;
+				second = num;
+				continue;
+			}else if(num > third) {
+				third = num;
+			}
+		}
+		return len >= 3 ? third : first;
+    }
+}
+```
+
