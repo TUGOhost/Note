@@ -19,6 +19,7 @@ LeetCode
 ThisSum[i]表示第i处，以A[i]结尾的子序列的最大和。 
 则状态方程为ThisSum[i]=max(ThisSum[i-1]+nums[i],nums[i])
 也即是说，如果ThisSum[i-1]<0则ThisSum[i]就是nums[i],否则ThisSum[i]=nums[i]+ThisSum[i-1]（因为是以i结尾的
+
 ### 代码
 ```java
 package leetcode;
@@ -948,6 +949,210 @@ class Solution {
 			}
 		}
 		return len >= 3 ? third : first;
+    }
+}
+```
+
+# 找到所有数组中消失的数字
+
+### 题目描述
+
+给定一个范围在  1 ≤ a[i] ≤ *n* ( *n* = 数组大小 ) 的 整型数组，数组中的元素一些出现了两次，另一些只出现一次。
+
+找到所有在 [1, *n*] 范围之间没有出现在数组中的数字。
+
+您能在不使用额外空间且时间复杂度为*O(n)*的情况下完成这个任务吗? 你可以假定返回的数组不算在额外空间内。
+
+**示例:**
+
+```
+输入:
+[4,3,2,7,8,2,3,1]
+
+输出:
+[5,6]
+```
+
+### 分析
+
+题目要求额外空间且时间复杂度为O(n)。按近小到大的顺序排序，如果该数字和对应数字-1所在索引不同，则交换位置，交换完i--，继续判断交换完的数字，循环完成后判断数字是否和索引+1的值相等，不等则加入集合。
+
+### 贴出代码
+
+```java
+class Solution {
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        List<Integer> a = new ArrayList<Integer>();
+		int temp;
+		for(int i = 0; i < nums.length; i++) {
+			if(nums[i] != nums[nums[i] - 1]) {
+				temp = nums[nums[i] - 1];
+				nums[nums[i] - 1] = nums[i];
+				nums[i] = temp;
+				i--;
+				
+			}
+		}
+		for(int i = 0; i < nums.length; i++) {
+			if(nums[i] != i+1) {
+				a.add(i+1);
+			}
+		}
+		return a;
+    }
+}
+```
+
+
+
+# 最大连续1的个数
+
+### 题目描述
+
+给定一个二进制数组， 计算其中最大连续1的个数。
+
+**示例 1:**
+
+```
+输入: [1,1,0,1,1,1]
+输出: 3
+解释: 开头的两位和最后的三位都是连续1，所以最大连续1的个数是 3.
+```
+
+**注意：**
+
+- 输入的数组只包含 `0` 和`1`。
+- 输入数组的长度是正整数，且不超过 10,000。
+
+### 分析
+
+这道题让我们求最大连续1的个数，不是一道难题。我们可以遍历一遍数组，用一个计数器cnt来统计1的个数，方法是如果当前数字为0，那么cnt重置为0，如果不是0，cnt自增1，然后每次更新结果res即可。
+
+### 贴出代码
+
+```java
+class Solution {
+    public int findMaxConsecutiveOnes(int[] nums) {
+        int res = 0, cnt = 0;
+		for(int num : nums) {
+			cnt = (num == 0) ? 0 : cnt +1;
+			res = Integer.max(res, cnt);
+		}
+		return res;
+    }
+}
+```
+
+# 数组拆分I
+
+### 题目描述
+
+给定长度为 **2n** 的数组, 你的任务是将这些数分成 **n** 对, 例如 (a1, b1), (a2, b2), ..., (an, bn) ，使得从1 到 n 的 min(ai, bi) 总和最大。
+
+**示例 1:**
+
+```
+输入: [1,4,3,2]
+
+输出: 4
+解释: n 等于 2, 最大总和为 4 = min(1, 2) + min(3, 4).
+```
+
+**提示:**
+
+1. **n** 是正整数,范围在 [1, 10000].
+2. 数组中的元素范围在 [-10000, 10000].
+
+### 分析
+
+先给数组排个序，然后依次加上两两中最小的一个。
+
+### 贴出代码
+
+```java
+class Solution {
+    public int arrayPairSum(int[] nums) {
+		if(nums.length == 2) 
+			return Math.min(nums[0], nums[1]);
+		int sub = 0;
+		int n = nums.length / 2;
+		Arrays.sort(nums);
+		for(int i = 0; i < nums.length; i++) {
+			sub += Math.min(nums[i], nums[i++]);
+		}
+		return sub;
+    }
+}
+```
+
+# 重塑矩阵
+
+### 题目描述
+
+在MATLAB中，有一个非常有用的函数 `reshape`，它可以将一个矩阵重塑为另一个大小不同的新矩阵，但保留其原始数据。
+
+给出一个由二维数组表示的矩阵，以及两个正整数`r`和`c`，分别表示想要的重构的矩阵的行数和列数。
+
+重构后的矩阵需要将原始矩阵的所有元素以相同的**行遍历顺序**填充。
+
+如果具有给定参数的`reshape`操作是可行且合理的，则输出新的重塑矩阵；否则，输出原始矩阵。
+
+**示例 1:**
+
+```
+输入: 
+nums = 
+[[1,2],
+ [3,4]]
+r = 1, c = 4
+输出: 
+[[1,2,3,4]]
+解释:
+行遍历nums的结果是 [1,2,3,4]。新的矩阵是 1 * 4 矩阵, 用之前的元素值一行一行填充新矩阵。
+```
+
+**示例 2:**
+
+```
+输入: 
+nums = 
+[[1,2],
+ [3,4]]
+r = 2, c = 4
+输出: 
+[[1,2],
+ [3,4]]
+解释:
+没有办法将 2 * 2 矩阵转化为 2 * 4 矩阵。 所以输出原矩阵。
+```
+
+**注意：**
+
+1. 给定矩阵的宽和高范围在 [1, 100]。
+2. 给定的 r 和 c 都是正数。
+
+### 分析
+
+对于这种二维数组大小重新非配的问题的关键就是对应位置的坐标转换，最直接的办法就是先把原数组拉直，变成一条直线，然后再组成新的数组。所以这道题我们先判断给定数组是否能重塑成给定的大小，就是看两者的元素总数是否相同，直接行数乘以列数即可，然后我们新建一个目标大小的数组，并开始遍历，对于每个位置，我们先转为拉直后的一维坐标，然后在算出在原数组中的对应位置赋值过来即可。
+
+### 贴出代码
+
+```java
+class Solution {
+    public int[][] matrixReshape(int[][] nums, int r, int c) {
+        int m = nums.length, n = nums[0].length;
+        if (r * c != m * n) {
+            return nums;
+        }
+        int[][] res;
+        res = new int[r][c];
+        for (int i = 0; i < r; ++i){
+            for( int j = 0; j < c; ++j){
+                int k = i * c + j;
+                res[i][j] = nums[k / n][k % n];
+            }
+        }
+        return res;
     }
 }
 ```
