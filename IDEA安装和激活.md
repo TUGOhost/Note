@@ -12,7 +12,7 @@
 
 [下载链接](https://download.jetbrains.com/idea/ideaIU-2018.1.6.exe)
 
-选择好安装地址，之后无脑***next***。
+选择好安装地址，之后无脑**next**。
 
 ### IDEA激活
 
@@ -26,27 +26,27 @@
 
 拿Windows为例
 
-hosts文件一般在`C:\Windows\System32\drivers\etc`目录下
+`hosts文件`一般在`C:\Windows\System32\drivers\etc`目录下
 
 ![](image/119.png)
 
-hosts文件存在权限，所以需要管理员权限才能打开。
+`hosts文件`存在权限，所以需要管理员权限才能打开。
 
-这里以`notepade++`为例
+这里以`notepad++`为例
 
 ![](image/120.png)(
 
-当然如果想通过记事本打开，只有将hosts文件拖到桌面，然后打开，再修改hosts文件。
+当然如果想通过记事本打开，只有将`hosts文件`拖到桌面，然后打开，再修改`hosts文件`。
 
 具体步骤：
 
-- 将hosts文件拖向桌面
+- 将`hosts文件`拖向桌面
 
   ![](image/121.png)
 
   点击继续即可。
 
-- 修改hosts文件内容
+- 修改`hosts文件`内容
 
   ![](image/122.png)
 
@@ -62,4 +62,4 @@ hosts文件存在权限，所以需要管理员权限才能打开。
 
 ![](image/124.png)
 
-- 复制完之后，粘贴到IDEA激活界面的linsence code中即可。
+- 复制完之后，粘贴到IDEA激活界面的`linsence code`中即可。

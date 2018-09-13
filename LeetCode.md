@@ -1180,12 +1180,26 @@ class Solution {
 
 ### 分析
 
-
+这个题目我就比较偷懒了，直接排序然后找前后不一样的数的位置就行了 
 
 ### 提出代码
 
 ```java
-
+class Solution {
+    public int findUnsortedSubarray(int[] nums) {
+        int[] sortedArr = Arrays.copyOf(nums,nums.length);
+        Arrays.sort(sortedArr);
+        int i = 0,j = nums.length - 1;
+        while(nums[i] == sortedArr[i] && i < j)
+            i++;
+        while(nums[j] == sortedArr[j] && i < j)
+            j--;
+        if(i == j)
+            return 0;
+        else
+            return j - i + 1;
+    }
+}
 ```
 
 
@@ -1224,7 +1238,51 @@ class Solution {
 
 ### 分析
 
+这个题目还是利用HashMap数据结构的题目。
 
+第一步：
+
+首先还是利用HashMap类来统计各个数字出现的次数，将数值和次数分别作为key和value存入HashMap。
+
+第二步：
+
+找到频率最大的那几个数值（可以是一个也可以是多个数值），然后每一个分别用双指针方法找到在数组中第一次和最后一次出现的位置，找到他们中距离最小的那个，返回这个距离。
 
 ### 提出代码
+
+```java
+class Solution {
+    public int findShortestSubArray(int[] nums) {
+                int maxCount = 1;
+        ArrayList<Integer> arr = new ArrayList<>();
+        HashMap<Integer,Integer> hm = new HashMap<>();
+        for(int n:nums){
+            if(hm.containsKey(n)){
+                int temp = hm.get(n) + 1;
+                hm.put(n, temp);
+                if(maxCount < temp){
+                    maxCount = temp;
+                }
+            }else{
+                hm.put(n,1);
+            }
+        }
+        Set<Integer> set = hm.keySet();
+        int minDis = Integer.MAX_VALUE;
+        for(int n:set){
+            int temp = Integer.MAX_VALUE;
+            if(hm.get(n) == maxCount){
+                int i=0,j = nums.length-1;
+                while(nums[i] != n && i<j)
+                    i++;
+                while(nums[j] != n && i<j)
+                    j--;
+                temp = j - i + 1;
+            }
+            minDis = Math.min(temp,minDis);
+        }
+        return minDis;
+    }
+}
+```
 
