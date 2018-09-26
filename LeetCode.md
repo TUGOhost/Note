@@ -1485,3 +1485,216 @@ class Solution {
 
 
 
+# 按奇偶校验排序数组
+
+### 题目描述
+
+给定一个非负整数数组 `A`，返回一个由 `A` 的所有偶数元素组成的数组，后面跟 `A` 的所有奇数元素。
+
+你可以返回满足此条件的任何数组作为答案。
+
+ 
+
+**示例：**
+
+```
+输入：[3,1,2,4]
+输出：[2,4,3,1]
+输出 [4,2,3,1]，[2,4,1,3] 和 [4,2,1,3] 也会被接受。
+```
+
+ 
+
+**提示：**
+
+1. `1 <= A.length <= 5000`
+2. `0 <= A[i] <= 5000`
+
+### 分析
+
+利用栈的特性，新的元素放在数组的最后面（即栈顶），不过Java中的栈类，跟这个题目要求的数组，我实在无解，这两个怎么转换。
+
+### 贴出代码
+
+```java
+class Solution {
+    public int[] sortArrayByParity(int[] A) {
+        List<Integer> res = new ArrayList();
+        List<Integer> odd = new ArrayList();
+        for(int i = 0; i < A.length; i++){
+            if (A[i] % 2 == 0)
+                res.add(A[i]);
+            else
+                odd.add(A[i]);
+        }
+        int resLen = res.size();
+        int oddLen = odd.size();
+        int[] out = new int[resLen + oddLen];
+        for(int j = 0; j < resLen; j++)
+            out[j] = res.get(j);
+        for(int n = 0; n < oddLen; n++)
+            out[n + resLen] = odd.get(n);
+        return out;
+    }
+}
+```
+
+# 单调数列
+
+### 题目描述
+
+如果数组是单调递增或单调递减的，那么它是*单调的*。
+
+如果对于所有 `i <= j`，`A[i] <= A[j]`，那么数组 `A` 是单调递增的。 如果对于所有 `i <= j`，`A[i]> = A[j]`，那么数组 `A` 是单调递减的。
+
+当给定的数组 `A` 是单调数组时返回 `true`，否则返回 `false`。
+
+ 
+
+ 
+
+**示例 1：**
+
+```
+输入：[1,2,2,3]
+输出：true
+```
+
+**示例 2：**
+
+```
+输入：[6,5,4,4]
+输出：true
+```
+
+**示例 3：**
+
+```
+输入：[1,3,2]
+输出：false
+```
+
+**示例 4：**
+
+```
+输入：[1,2,4,5]
+输出：true
+```
+
+**示例 5：**
+
+```
+输入：[1,1,1]
+输出：true
+```
+
+ 
+
+**提示：**
+
+1. `1 <= A.length <= 50000`
+2. `-100000 <= A[i] <= 100000`
+
+### 分析
+
+按照递增和递减分别写两个函数，放到目标函数中做判断。
+
+### 贴出代码
+
+```java
+class Solution {
+    public boolean isMonotonic(int[] A) {
+         if(upMonotonic(A)||downMontonic(A))
+            return true;
+        else if(A.length == 1)
+            return true;
+        else return false;
+    }
+    public boolean upMonotonic(int[] A){
+        int a,b;
+        boolean t = false;
+        for(int i = 1; i < A.length; i++){
+            a = A[i - 1];
+            b = A[i];
+            if(a <= b)
+                t =true;
+            else{
+                t = false;
+                break;
+            }
+        }
+        return t;
+    }
+
+    public boolean downMontonic(int[] A){
+        int a,b;
+        boolean t = false;
+        for(int i = 1; i < A.length; i++){
+            a = A[i - 1];
+            b = A[i];
+            if(a >= b)
+                t =true;
+            else{
+                t = false;
+                break;
+            }
+        }
+        return t;
+    }
+}
+```
+
+# 1比特与2比特字符
+
+### 题目描述
+
+有两种特殊字符。第一种字符可以用一比特`0`来表示。第二种字符可以用两比特(`10` 或 `11`)来表示。
+
+现给一个由若干比特组成的字符串。问最后一个字符是否必定为一个一比特字符。给定的字符串总是由0结束。
+
+**示例 1:**
+
+```
+输入: 
+bits = [1, 0, 0]
+输出: True
+解释: 
+唯一的编码方式是一个两比特字符和一个一比特字符。所以最后一个字符是一比特字符。
+```
+
+**示例 2:**
+
+```
+输入: 
+bits = [1, 1, 1, 0]
+输出: False
+解释: 
+唯一的编码方式是两比特字符和两比特字符。所以最后一个字符不是一比特字符。
+```
+
+**注意:**
+
+- `1 <= len(bits) <= 1000`.
+- `bits[i]` 总是`0` 或 `1`.
+
+### 分析
+
+题目说，2比特为10或11，所以遇到1的时候跳两位，遇到0开头就是1比特，跳一位。
+
+### 贴出代码
+
+```java
+class Solution {
+    public boolean isOneBitCharacter(int[] bits) {
+        int i;
+        for(i = 0; i < bits.length - 1;){
+            if(bits[i] == 0){
+                i++;
+            }else
+                i = i + 2;
+        }
+        return (i == bits.length - 1) ? true : false;
+    }
+}
+```
+
