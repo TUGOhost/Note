@@ -1725,3 +1725,75 @@ class Solution {
 
 ### 分析
 
+先对数组中的元素进行排序，然后再用递归分治法进行求解。 
+
+### 贴出代码
+
+```java
+class Solution {
+    private List<List<Integer>> res;
+    private List<Integer> list;
+    private int[] set;
+    private int num;
+
+
+    public List<List<Integer>> subsets(int[] nums){
+        res = new LinkedList<>();
+
+        if(nums != null){
+            list = new ArrayList<>();
+            quickSort(nums, 0, nums.length -1);
+            set = nums;
+            for(int i = 0; i <= nums.length; i++){
+                num = i;
+                subset(0);
+            }
+        }
+        set = null;
+        list = null;
+        return res;
+    }
+
+    public void subset(int start){
+        if(num == 0){
+            List<Integer> tmp = new ArrayList<>();
+            for(Integer i : list){
+                tmp.add(i);
+            }
+            res.add(tmp);
+            return;
+        }
+        int endFirst = set.length - num;
+        for(int i = start; i <= endFirst; i++){
+            list.add(set[i]);
+            num--;
+            subset(i + 1);
+            num++;
+            list.remove(new Integer(set[i]));
+        }
+    }
+    private void quickSort(int[] arr, int lo,int hi){
+        if(lo < hi){
+            int mid = getMid(arr,lo,hi);
+            quickSort(arr,lo,mid -1);
+            quickSort(arr,mid + 1,hi);
+        }
+    }
+    private int getMid(int[] arr,int lo,int hi){
+        int tmp = arr[lo];
+        while(lo < hi){
+            while(lo < hi && arr[hi] > tmp){
+                hi--;
+            }
+            arr[lo] = arr[hi];
+            while(lo < hi && arr[lo] < tmp){
+                lo++;
+            }
+            arr[hi] = arr[lo];
+        }
+        arr[lo] = tmp;
+        return lo;
+    }
+}
+```
+
