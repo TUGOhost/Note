@@ -498,3 +498,47 @@ public static void testHandlePromotion(){
 }
 ```
 
+# 虚拟机性能监控与故障处理工具
+
+## JDK的命令行工具
+
+| 名称   | 主要作用                                                     |
+| :----- | ------------------------------------------------------------ |
+| jps    | JVM Process Status Tool，显示指定系统内所有的HotSpot虚拟机进程 |
+| jstat  | JVM Statistics Monitoring Tool，用于收集HotSpot虚拟机各方面的运行数据 |
+| jinfo  | Configuration Info for Java，显示虚拟机配置信息              |
+| jmap   | Memory Map for Java，生成虚拟机的内存转储快照（heapdump文件） |
+| jhat   | JVM Heap Dump Browser，用于分析heapdump文件，它会建立一个HTTP/HTML服务器，让用户可以在浏览器上查看分析结果 |
+| jstack | Stack Trace for Java，显示虚拟机的线程快照                   |
+|        |                                                              |
+
+### jps：虚拟机进程状况工具
+
+它的功能也和ps命令类似：可以列出正在运行的虚拟机进程，并显示虚拟机执行主类（Main Class，main()函数所在的类）的名称，以及这些进程的本地虚拟机的唯一ID(LVMID，Local Virtual Machine Identifier)。对于本地虚拟机进程来说，LVMID与操作系统的进程ID（PID,Process Identifier）是一致的。如果同时启动了多个虚拟机进程，无法根据进程名称定位时，那就只能依赖jps命令显示主类的功能才能区分了。
+
+| 选项 | 作用                                                 |
+| ---- | ---------------------------------------------------- |
+| -q   | 只输出LVMID，省略主类的名称                          |
+| -m   | 输出虚拟机进程启动时传递给主类main()函数的参数       |
+| -l   | 输出主类的全名，如果进程执行的是Jar包，输出Jar包路径 |
+| -v   | 输出虚拟机进程启动时JVM参数                          |
+|      |                                                      |
+
+### jstat：虚拟机统计信息监视工具
+
+jstat(JVM Statistics Monitoring Tool)是用于监视虚拟机各种运行状况信息的命令行工具。它可以显示本地或远程虚拟机进程中的类装载、内存、垃圾收集、JIT编译等运行数据，在没有GUI图形界面，只提供了纯文本控制台环境的服务器上，它将是运行期定位虚拟机性能问题的首选工具。
+
+| 选项           | 作用                                                         |
+| -------------- | ------------------------------------------------------------ |
+| -class         | 监视类装载、卸载数量、总空间及装载所耗费的时间               |
+| -gc            | 监视Java堆状况，包括Eden区、2个survivor区、老年代、永久代等的容量、已用空间、GC时间合计等信息 |
+| -gccapaity     | 监视内容与-gc基本相同，但输出主要关注Java堆各个区域使用到的最大和最小空间 |
+| -gcutil        | 监视内容与0gc基本相同，但输出主要关注已使用空间占总空间的百分比 |
+| -gcnew         | 监视新生代GC的状况                                           |
+| -gcnewcapacity | 监视内容与-gcnew基本相同，输出主要关注使用到的最大和最小空间 |
+| -gcold         | 监视老年代GC的状况                                           |
+| -gcoldcapacity | 监视内容与-gcold基本相同，输出主要关注使用到的最大和最小空间 |
+| -gcpermcapacity | 输出永久代使用到的最大和最小空间 |
+| -compiler | 输出JIT编译器编译过的方法、耗时等信息 |
+| -printcompilation | 输出已经被JIT编译的方法                                       |
+
