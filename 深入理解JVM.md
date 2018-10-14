@@ -542,3 +542,47 @@ jstat(JVM Statistics Monitoring Tool)是用于监视虚拟机各种运行状况�
 | -compiler | 输出JIT编译器编译过的方法、耗时等信息 |
 | -printcompilation | 输出已经被JIT编译的方法                                       |
 
+
+
+### jinfo：Java配置信息工具
+
+jinfo（Configuration Info for Java）的作用是实时地查看和调整虚拟机的各项参数。
+
+### jmap：Java内存映射工具
+
+jmap（Memory Map for Java）命令用于生成堆转储快照（一般称为headdump或dump文件）。它的作用不仅仅是为了获得dump文件，它还可以查询finalize执行队列，Java堆和永久代的详细信息，如空间使用率、当前用的是那种收集器等。
+
+| 选项           | 作用                                                         |
+| -------------- | ------------------------------------------------------------ |
+| -dump          | 生成Java堆转储快照。格式为：-dump:[live,]format=b,file=<filename>，其中live子参数说明是否只dump出存活的对象 |
+| -finalizerinfo | 显示在F-Queue中等待Finalizer线程执行finalize方法的对象。只在Linx/Solaris平台下有效 |
+| -heap          | 显示Java堆详细信息，如使用那种回收器、 参数配置、分代状况等。只在Linx/Solaris平台下有效 |
+| -histo         | 显示堆中对象统计信息，包括类、实例数量和合计容量             |
+| -permstat      | 以ClassLoader为统计口径显示永久代内存状态。只在Linx/Solaris平台下有效 |
+| -F             | 当虚拟机进程堆-dump选项没有响应时，可使用这个选项强制生成dump快照。只在Linux/Solaris平台下有效 |
+
+### jhat：虚拟机堆转储快照分析工具
+
+jhat（JVM Heap Analysis Tool）命令与jmap搭配使用，来分析jmap生成的堆转储快照。
+
+### jstack：Java堆栈跟踪工具
+
+jstack（Stack Trace for Java）命令用于生成虚拟机当前时刻的线程快照（一般称为threaddump或javacore文件）。线程快照就是当前虚拟机内每一条线程正在执行的方法堆栈的集合，生成线程快照的主要目的是定位线程出现长时间停顿的原因，如线程间死锁、死循环、请求外部资源导致的长时间等待等都是导致线程长时间停顿的常见原因。
+
+| 选项 | 作用                                         |
+| ---- | -------------------------------------------- |
+| -F   | 当正常输出的请求不被响应时，强制输出线程堆栈 |
+| -I   | 除堆栈外，显示关于锁的附加信息               |
+| -m   | 如果调用到本地方法的话，可以显示C/C++的堆栈  |
+
+
+
+## JDK的可视化工具
+
+### JConsole：Java监视与管理控制台
+
+JConsole（Java Monitoring and Management Console）是一款基于JMX的可视化监视和管理的工具。
+
+### VisualVM：多合一故障处理工具
+
+VisualVM（All-in-One Java Troubleshooting Tool）是到目前为止，随JDK发布的功能最强大的运行监视和故障处理程序，并且可以预见在未来一段时间内都是官方主力发展的虚拟机故障处理工具。

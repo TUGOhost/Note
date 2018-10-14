@@ -286,3 +286,126 @@ Spring提供了测试模块来测试Spring应用。
 
 ## 声明Bean
 
+#### 创建Spring配置
+
+从Spring3.0开始，Spring容器提供了两种配置Bean的方式。传统上，Spring使用一个或多个XML文件作为配置文件，而Spring3.0还同时提供了基于Java注解的配置方式，我们首先来关注传统的XML文件配置方式
+
+在XML文件中声明Bean时，Spring配置文件的根元素是来源于Spring beans命名空间所定义的<beans>元素。以下为一个典型的Spring XML配置文件：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframe.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    <!-- Bean declarations go here -->
+    </bean>
+```
+
+在<beans>元素内，你可以放置所有的Spring配置信息，包括<bean>元素的声明。Spring的核心框架自带了10个命名空间配置，如表：
+
+| 命名空间 | 用途                                                         |
+| -------- | ------------------------------------------------------------ |
+| aop      | 为声明切面以及将@AspectJ注解的类代理为Spring切面提供了配置元素 |
+| beans    | 支持声明Bean和装配Bean，是Spring最核心也是最原始的命名空间   |
+| context  | 为配置Spring应用上下文提供了配置元素，包括自动检测和自动装配Bean、注入非Spring直接管理的对象 |
+| jee      | 提供了与Java EE API的集成，例如JNDI和EJB                     |
+| jms      | 为声明消息驱动的POJO提供了配置元素                           |
+| lang     | 支持配置由Groovy、JRuby或BeanShell等脚本实现的Bean           |
+| mvc      | 启用Spring MVC的能力，例如面向注解的控制器、视图控制器和拦截器 |
+| tx       | 提供声明式配置                                               |
+| oxm      | 支持Spring的对象到XML映射配置                                |
+| util | 提供各种各样的工具类元素，包括把集合配置为Bean、支持属性占位符元素 |
+
+
+
+#### 声明一个简单的Bean
+
+```xml
+<bean id="duke" class="com.springaction.springidol.Juggler" />
+```
+
+<bean>元素是Spring中最基本的配置单元，通过该元素SPring将创建一个对象。这里创建了一个由SPring容器管理的名字为duke的Bean。这有可能是最简单的<bean>配置方式。id属性定义了Bean的名字，也作为该Bean在Spring容器中的引用。这个Bean被称为duke。你还可以根据class属性得知，duke是一个Juggler。
+
+当Spring容器加载该Bean时，Spring将使用默认的构造器来实例化duke Bean。实际上duke会使用如下代码来创建：
+
+```java
+new com.springincation.springidol.Juggler();
+```
+
+为了给Duke一个排练的机会，你可以使用如下代码加载Spring上下文：
+
+```java
+ApplicationContext ctx = new ClassPathXmlApplicationContext(
+"classpath/spring-idol.xml");
+```
+
+#### 通过构造器注入
+
+下面的XML声明了Duke成为一个可以同时抛15个豆子的杂技师：
+
+```xml
+<bena id="duke"
+      class="com.spirngincation.springidol.Juggler">
+<constructor-arg value="15" />
+</bena>
+```
+
+在构造Bean的时候，我们可以使用<constructor-arg>元素告诉Spring额外的信息。不配置<constructor-arg>元素，那么Spring将使用默认的构造方法。
+
+**通过构造器注入对象引用**
+
+可以使用下面的XML配置将Sonnet29声明为一个Spring<bean>:
+
+```xml
+<bean id="sonnet29"
+      class="com.springinaction.springidol.Sonnet29" />
+```
+
+有了poem，你需要做的就是将poem赋予Duke。现在Duke是一个PoeticJuggler了，它的<bean>声明需要稍微修改一下：
+
+```xml
+<bean id="poeticDuke"
+      class="com.springinaction.springidol.PoeticJuggler">
+<constructor-arg value="15"/>
+<constructor-arg ref="sonnet29" />
+</bean>
+```
+
+构造PoeticJuggler的唯一方法只能使用带有参数的构造方法。*我们可以使用带有int参数和Poem引用的构造方法。在Duke Bean的声明中，我们通过<constructor-arg>元素的value属性将豆袋子的个数配置为15。
+
+但是，我们不能使用value属性为第二个构造参数赋值，因为Poem不是简单类型。取而代之的是，我们使用ref属性来讲ID为sonnet29的Bean引用传递给构造器。可以想象当Spring碰到sonnet29和duke的<bean>声明时，它所执行的逻辑本质上与下面的Java代码相同：
+
+```java
+Poem sonnet29 = new Sonnet29();
+Performer duke = new PoeticJuggler(15, sonnet29);
+```
+
+**通过工厂方法创建Bean**
+
+有时候静态工厂方法是实例化对象的唯一方法。Spring支持通过<bean>元素的factory-method属性来装配工厂创建的Bean。
+
+#### Bean的作用域
+
+所有的Spring Bean默认都是单例。当容器分配一个Bean时（不论是通过装配还是调用容器的getBean()方法），它总是返回Bean的同一个实例。
+
+当在Spring中配置<bean>元素时，我们可以为Bean声明一个作用域。为了让Spring在每次请求时都为Bean产生一个新的实例，我们只需要配置Bean的scope属性为prototype即可。
+
+<bean id="" class="" scope="prototype" />
+
+| 作用域         | 定义                                                         |
+| -------------- | ------------------------------------------------------------ |
+| singleton      | 在每一个Spirng容器中，一个Bean定义只有一个对象实例           |
+| prototype      | 允许Bean的定义可以被实例化任意次（每次调用都创建一个实例）   |
+| request        | 在一次HTTP请求中，每个Bean定义对应一个实例。该作用域仅在基于Web的Spring上下文（例文（例如Spring MVC）中才有效 |
+| session        | 在一个HTTP Session中，每个Bean定义对应一个实例。该作用域仅在基于Web的Spring上下文（例文（例如Spring MVC）中才有效 |
+| global-session | 在一个全局HTTP Session中，每个Bean定义对应一个实例。该作用于仅在Portlet上下文中才有效 |
+
+#### 初始化和销毁Bean
+
+为Bean定义初始化和销毁操作，只需要使用init-method和destroy-method参数来配置<bean>元素。init-method属性指定了在初始化Bean时要调用的方法。类似地，destroy-method属性指定了Bean从容器移除之前要调用的放法。
+
+### 注入Bean属性
+
+通常，JavaBean的属性是私有的，同时拥有一组存取器方法，以setXXX()和getXXX()形式存在。Spring可以借助属性的set方法来配置属性的值，以实现setter方式的注入。
+
