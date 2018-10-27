@@ -290,7 +290,7 @@ Spring提供了测试模块来测试Spring应用。
 
 从Spring3.0开始，Spring容器提供了两种配置Bean的方式。传统上，Spring使用一个或多个XML文件作为配置文件，而Spring3.0还同时提供了基于Java注解的配置方式，我们首先来关注传统的XML文件配置方式
 
-在XML文件中声明Bean时，Spring配置文件的根元素是来源于Spring beans命名空间所定义的<beans>元素。以下为一个典型的Spring XML配置文件：
+在XML文件中声明Bean时，**Spring配置文件的根元素是来源于Spring beans命名空间所定义的<beans>元素**。以下为一个典型的Spring XML配置文件：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -408,4 +408,336 @@ Performer duke = new PoeticJuggler(15, sonnet29);
 ### 注入Bean属性
 
 通常，JavaBean的属性是私有的，同时拥有一组存取器方法，以setXXX()和getXXX()形式存在。Spring可以借助属性的set方法来配置属性的值，以实现setter方式的注入。
+
+# 最小化Spring XML配置
+
+Spring提供了几种技巧，可以帮助我们减少XML的配置数量。
+
+- 自动装配（autowiring）有助于减少甚至消除配置<property>元素和<constructor-arg>元素，让Spring自动识别如何装配Bean的依赖关系。
+- 自动检测（autodiscovery）比自动装配更进了一步，让Spring能够自动识别哪些类需要被装配成Spring Bean，从而减少对<bean>元素的使用。
+
+当自动装配和自动检测一起使用时，它们可以显著减少Spring的XML配置数量。通常只需要配置少量的几行XML代码，而无需知道在Spring的应用上下文中究竟有多少Bean。
+
+### 自动装配Bean属性
+
+自动装配（autowiring）
+
+#### 4种类型的自动装配
+
+当涉及自动装配Bean的依赖关系时，Spring有多种处理方式。因此，Spring提供了4种各具特色的自动装配策略。
+
+- byName——把与Bean的属性具有相同名字（或者ID）的其他Bean自动装配到Bean的对应属性中。如果没有跟属性的名字相匹配的Bean，则该属性不进行装配。
+- byType——把与Bean的属性具有相同类型的其他Bean自动装配到Bean的对应属性中。如果没有跟属性的类型相匹配的Bean，则该属性不被装配。
+- constructor——把与Bean的构造器入参具有相同类型的其他Bean自动装配到Bean构造器的对应入参中。
+- autodetect——首先尝试使用constructor进行自动装配。如果失败，再尝试使用byType进行自动装配。
+
+**byName自动装配**
+
+举个栗子：
+
+```xml
+<bean id="kenny2"
+      class="com.springinaction.springidol.Instrumentalist">
+<property name="song" value="Jingle Bells" />
+    <property name="instrument" ref="saxophone" />
+</bean>
+```
+
+在这里，我们使用<property>元素显式装配了Kenny的instrument属性。假设使用<bean>元素在定义萨克斯（saxophone）时，把Bean的id属性设置为instrument：
+
+```xml
+<bean id="instrument"
+  		class="com.springinaction.springIdol.Saxphone" />
+```
+
+在本示例中，萨克斯（saxophone）Bean的id属性与Keeny Bean的instrument属性的名字是一样的。通过配置autowire属性，Spring就可以利用此信息自动装配kenny的instrument属性
+
+```xml
+<bena id="kenny"
+      class="com.springinaction.springidol.Instrumentlist"
+      autowire="byName">
+<property name="song" value="Jingle Bells"/>
+</bena>
+```
+
+
+
+byName自动装配遵循一项约定：为属性自动装配ID与该属性的名字相同的Bena。通过设置autowire属性为byName，Spring将特殊对待kenny的所有属性，为这些属性寻找与其名字相同的Spring Bean。在这里，Spring会发现instrument属性可以通过setter注入来进行自动装配。
+
+使用byName自动装配的缺点是需要假设Bean的名字与其他Bean的属性的名字一样。
+
+**byType自动装配**
+
+byType自动装配的工作方式类似于byName自动装配，只不过不再是匹配属性的名字而是检查属性的类型。当我们尝试使用byType自动装配时，Spring会寻找哪一个Bean的类型与属性的类型相匹配。
+
+**constructor自动装配**
+
+如果要通过构造器注入来配置Bean，那我们可以移除<constructor-arg>元素，由Spring在应用上下文中自动选择Bean注入到构造器入参中。
+
+例如：
+
+```xml
+<bean id="duke"
+      class="com.springinaction.springidol.PoeticJuggler"
+      autowire="constructor"
+      />
+```
+
+上述声明告诉Spring去审视PoeticJuggler的构造器，并尝试在Spring配置中寻找匹配PoeticJuggler某一个构造器所有入参的Bean。
+
+**最佳自动装配**
+
+如果想自动装配Bean，但是又不能决定该使用那一种类型的自动装配。现在不必担心了，我们可以设置autuwire属性为autodetect，由Spring来决定。例如
+
+```xml
+<bean id="duke"
+      class="com.springinaction.springidol.PoeticJuggle"
+      autowire="autodetect"/>
+```
+
+当配置一个Bean的autowire属性为autodetect时，Spring将首先尝试使用constructor自动装配，如果没有发现与构造器相匹配的Bean时，Spring将尝试使用byType自动装配。
+
+#### 默认自动装配
+
+default-autowire
+
+#### 混合使用自动装配和显式装配
+
+
+
+### 使用注解装配
+
+从Spring2.5开始，最有趣的一种装配Spring Bean的方式是使用注解自动装配Bean的属性。使用注解自动装配与在XML中使用autowire属性自动装配并没有太大差别。但是使用注解方式允许更细粒度的自动装配，我们可以选择性地标注某一属性来对应其应用自动装配。
+
+Spring容器默认禁止注解装配。所以，在使用基于注解的自动装配前，我们需要在Spring配置中启用它。最简单的启用方式是使用Spring的context命名空间配置中的<context:annotation-config  />元素。
+
+<context:annotation-config  />元素告诉Spring我们打算使用基于注解的自动装配。一旦配置完成，我们就可以对代码添加注解，标识Spring应该为属性、方法和构造器进行自动装配。
+
+Spring3支持几种不同的用于自动装配的注解：
+
+- Spring自带的@Autowired注解
+- JSR-330的@Inject注解
+- JSR-250的@Resource注解
+
+#### 使用@Autowired
+
+假设我们希望使用@Autowired让Spring自动装配乐器演奏家（Instrumentalist）Bean的instrument属性。则可以对setInstrument()方法进行标注，如下
+
+```java
+@Autowired
+public void setInstrument(Instrument instrument){
+    this.instrument = instrument;
+}
+```
+
+当Spring发现我们对setInstrument()方法使用了@Autowired注解时，Spring就会尝试对该方法执行byType自动装配。@Autowired也可以用于装配Bean的引用和标注构造器。
+
+##### 可选的自动装配
+
+默认情况下，@Autowired具有强契约特征，其所标注的属性或参数必须是可装配的。如果没有Bean可以装配到@Autowired所标注的属性或参数中，自动装配就会失败（抛出令人讨厌的NoSuchBeanDefinitionException）。这可能是我们所期望的处理方式——当自动装配无法完成时，让Spring尽早失败，远胜于以后抛出异常。
+
+属性不一定非要装配，null值也是可以接受的。在这种场景下，可以通过设置@Autowired的required属性为false来配置自动装配是可选的。
+
+```java
+@Autowired(required=false)
+private Instrument instrument;
+```
+
+在这里，Spring将尝试装配instrument属性，但是如果没有查找到与之匹配的类型为Instrument的Bean，应用就不会发生任何问题，而instrument属性的值会设置为null。
+
+##### 限定歧义性的依赖
+
+为了帮助@Autowired鉴别出哪一个Bean才是我们所需要的，我们可以配合使用Spring的@Qualifier注解。
+
+例如，为了确保Spirng为eddie Bean选择吉他（guitar）来演奏，即使有其他Bean也可以装配到instrument属性中，但我们可以使用@Qualifier来明确指定名为guitar的Bean：
+
+```java
+@Autowired
+@Qualifier("guitar")
+private Instrument instrument;
+```
+
+如上所示，@Qualifier注解将尝试注入ID为guitar的Bean。
+
+#### 借助@Inject实现基于标准的自动装配
+
+和@Autowired一样，@Inject可以用来自动装配属性、方法和构造器；与@Autowired不同的是，@Injet没有required属性。因此，@Inject注解所标注的依赖关系必须存在，如果不存在，则会抛出异常。
+
+例如，我们有一个KnifeJuggler类需要注入一个或多个Knife的实例。假设Knife Bean的作用域声明为prototype，下面的KnifeJuggler的构造器将获得5个Knife Bean：
+
+```java
+private Set<Knife> knives;
+
+@Inject
+public KnifeJuggler(Provider<Knife> knifeProvider){
+	knives = new HashSet<Knife>();
+    for(int i=0;i<5;i++){
+		knives.add(knifeProvider.get());
+    }
+}
+```
+
+KnifeJuggler将获得一个Provider<Knife>，而不是在构造器中获得一个Knife实例。这个时候，只有provider被注入进去；在调用provider的get()方法之前，实际的Knife对象并没有被注入。在这个示例中，get()方法被调用了5次。因为Knife Bean的作用域为prototype，所以knife的Set集合将被赋予5个不同的Knife对象。
+
+##### 限定@Inject所标注的属性
+
+@Named注解的工作方式非常类似于Spring的@Qualifier，正如我们在这里所看到的：
+
+```java
+@Inject
+@Named("guitar")
+private Instrument instrument;
+```
+
+#### 在注解注入中使用表达式
+
+@Value注解尽管易于使用，但我们很快就会发现，它同样具有威力。我们可以通过@Value直接标注某个属性、方法或者方法参数，并传入一个String类型的表达式来装配属性。例如：
+
+```java
+@Value("Eruption")
+private String song;
+```
+
+在这里，我们为String类型的属性装配了一个String类型的值。但是传入@Value的String类型的参数只是一个表达式——它的结算结果可以是任意类型，因此@Value能够标注任意类型的属性。
+
+### 自动检测Bean
+
+\<context:component-scan>元素除了完成了与\<context:annotation-config>一样的工作，还允许Spring自动检测Bean和定义Bean。
+
+\<context:component-scan>元素会扫描指定的包及其所有子包，并查找能够自动注册为Spring Bean的类。base-package属性标识了\<context:component-scan>元素所扫描的包。
+
+#### 为自动检测标注Bean
+
+默认情况下，<context:component-scan >查找使用构造器（stereotype）注解所有标注的类，这些特殊的注解如下：
+
+- @Component ——通用的构造型注解，标识该类为Spring组件。
+- @Controller——标识将该类定义为SpringMVC controller。
+- @Repository——标识将该类定义为数据仓库
+- @Service——标识将该类定义为服务。
+- 使用@Component标注的任意自定义注解。
+
+
+
+#### 过滤组件扫描
+
+通过为\<context:component-scan>配置\<context:include-filter>和/或者\<context:exclude-filter>子元素，我们可以随意调整扫描行为。
+
+| 过滤器类型 | 描述                                                         |
+| ---------- | ------------------------------------------------------------ |
+| annotation | 过滤器扫描使用指定注解所标注的那些类，通过expression属性指定要扫描的注解 |
+| assignable | 过滤器扫描派生于expression属性所指定类型的那些类             |
+| aspectj    | 过滤器扫描与expression属性所指定的AspectJ表达式所匹配的那些类 |
+| custom     | 使用自定义的org.springframework.core.type.TypeFilter实现类，该类由expression |
+| regex      | 过滤器扫描类的名称与expression属性所指定的正则表达式匹配的那些类 |
+
+
+
+# 面向切面的Spring
+
+## 什么是面向切面编程
+
+在软件开发中，分布于应用中多处的功能被称为**横切关注点**（cross-cutting concerns）。通常，这些横切关注点从概念上是与应用的业务逻辑相分离的（但是往往直接嵌入到应用的业务逻辑之中）。将这些横切关注点与业务逻辑相分离正是**面向切面编程（AOP）**所要解决的。例如，安全就是一个横切关注点，应用中的许多方法都会设计安全规划。图4.1直接呈现了横切关注点的概念。
+
+![](image/225.png)
+
+### 定义AOP术语
+
+与大多数技术一样，AOP已经形成了自己的术语。横切关注点的常用术语有通知（advice）、切点（pointcut）和连接点（join point）。如图展示了这些概念是如何关联在一起的。
+
+![](image/226.png)
+
+**通知（Advice）**
+
+当抄表员出现在我们家门口时，他们要登记用电量并回去向电力公司报告。显然，他们必须有一份需要抄表的住户清单，他们所汇报的信息也很重要。但是记录用电量才是抄表员的主要工作。
+
+类似地，切面也有目标——它必须要完成的工作。在AOP术语中，切面的工作被称为通知。
+
+通知定义了切面是什么以及何时使用。除了描述切面要完成的工作，通知还解决了何时执行这个工作的问题。它应该应用于某个方法被调用之前？之后？之前和之后？还是只在方法抛出异常时？
+
+Spirng切面可以应用5种类型的通知。
+
+- Before——在方法被调用之前调用通知。
+- After——在方法完成之后调用通知，无论方法执行是否成功。
+- After-returning——在方法成功执行之后调用通知。
+- After-throwing——在方法抛出异常后调用通知。
+- Around——通知包裹了被通知的方法，在被通知的方法调用之前和调用之后执行自定义的行为。
+
+**连接点（Joinpoint）**
+
+我们的应用可能也需要对数以千计的时机应用通知。这些时机被称为来连接点。连接点是在应用执行过程种能够插入切面的一个点。这个点可以是调用方法时、抛出异常时、甚至修改一个字段时。切面代码可以利用这些点插入到应用的正常流程之中，并添加新的行为。
+
+**切点（Pointcut）**
+
+一个切面并不需要通知应用的所有连接点。切点有助于缩小切面通知连接点的范围。
+
+如果通知定义了切面的“什么”和“何时”，那么切点就定义了“何处”。切点的定义会匹配通知所要织入的一个或多个连接点。我们通常使用明确的类和方法名称类指定这些切点，或是利用正则表达式定义匹配的类和方法名称模式来指定这些切点。有些AOP框架允许我们创建动态的切点，可以根据运行时的决策（比如方法的参数值）来决定是否应用通知。
+
+**切面（Aspect）**
+
+切面是通知和切点的结合。通知和切点共同定义了关于切面的全部内容——它是什么，在何时和何处完成其功能。
+
+**引入（Introduction）**
+
+引入允许我们向现有的类添加新方法或属性。
+
+**织入（Weaving）**
+
+织入是将切面应用到目标对象来创建新的代理对象的过程。切面在指定的连接点被织入到目标对象种。在目标对象的生命周期里有多个点可以进行织入。
+
+- 编译期——切面在目标类编译时被织入。这种方式需要特殊的编译器。AspectJ的织入编译器就是以这种方式织入切面的。
+- 类加载期——切面在目标类加载到JVM时被织入。这种方式需要特殊的类加载器（ClassLoader），它可以在目标类被引用应用之前增强该目标类的字节码。AspectJ5的LTW（load-time weaving）就支持以这种方式织入切面。
+- 运行期——切面在应用运行的某个时刻被织入。一般情况下，在织入切面时，AOP容器会为目标对象动态地创建一个代理对象。Spring  AOP就是以这种方式织入切面的。
+
+### Spring对AOP的支持
+
+并不是所有的AOP框架都是一样的，它们在连接点模型上可能有强弱之分。有些允许对字段修饰符级别应用通知，而另一些只支持与方法调用相关的连接点。它们织入切面的方式和时机也有所不同。但是无论无何，创建切点来定义切面织入的连接点是AOP框架的基本功能。
+
+主要有如下三个框架：
+
+- AspectJ（http://eclipse.org/aspectj）；
+- JBoss AOP（http://www.jboss.org/jbossaop）；
+- Spring AOP（http://www.springframework.org）。
+
+Spring提供了4种各具特色的AOP支持：
+
+- 基于代理的经典AOP；
+- @AspectJ注解驱动的切面；
+- 纯POJO切面；
+- 注入式AspectJ切面（适合Spring各版本）。
+
+前3种都是Spring基于代理的AOP变体，因此，Spring对AOP的支持局限于方法拦截。如果AOP需求超过了简单方法拦截的范畴（比如构造器或属性拦截），那么应该考虑在AspectJ里实现切面，利用Spring的DI把Spring  Bean注入到AspectJ切面中。
+
+**Spring通知是Java编写的**
+
+Spring所创建的通知都是用标准的Java类编写的。这样的话，我们就可以使用与普通Java开发一样的集成开发环境（IDE）来开发切面。
+
+AspectJ与之相反。虽然AspectJ现在支持基于注解的切面，但是AspectJ最初是以Java语言扩展的方式实现的。
+
+## 使用切点选择连接点
+
+
+
+### 编写切点
+
+### 使用Spring的bean()指示器
+
+
+
+## 在XML中声明切面
+
+
+
+| AOP配置元素              | 描述 |
+| ------------------------ | ---- |
+| \<aop:advisor>           | 定义AOP通知器 |
+| \<aop:after>             | 定义AOP后置通知（不管被通知的方法是否执行成功） |
+| \<aop:after-returning>   | 定义AOP after-returning通知 |
+| \<aop:after-throwing>    | 定义after-throwing通知 |
+| \<aop:around>            | 定义AOP环绕通知 |
+| \<aop:aspect>            | 定义切面 |
+| \<aop:aspectj-autoproxy> | 启用@AspectJ注解驱动的切面 |
+| \<aop:before>            | 定义AOP前置通知 |
+| \<aop:config>            | 顶层的AOP配置元素，大多数的\<aop:*>元素必须包含在\<aop:config>元素内 |
+| \<aop:declare-parents>            | 为被通知的对象引入额外的接口，并透明地实现 |
+| \<aop:pointcut>            | 定义切点 |
 

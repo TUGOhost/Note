@@ -17,7 +17,7 @@ public Manager(String name, double salary, int year, int month, int day){
 
 关键字`this`的两个用途：
 
-1. 引用yin'shi隐式参数
+1. 引用隐式参数
 2. 调用该类其他的构造器
 
 关键字`super`的两个用途：
