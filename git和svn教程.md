@@ -262,105 +262,372 @@ git rm README.md
 
 # 在Linux中使用SVN
 
-大多数 GNU/Linux 发行版系统自带了Subversion ，所以它很有可能已经安装在你的系统上了。可以使用下面命令检查是否安装了。
+开发人员经常会上传代码，或者改对代码做一些更改。svn就是用来将修改后的代码更新到服务器上的。下面就来看一下怎么在Linux环境下搭建svn服务（subversion）。
 
+步骤：
+1、检查是否已经有svn
+2、安装subversion
+3、检查是否安装成功
+4、创建svn资源仓库
+5、新增用户及密码，配置权限，配置资源库权限
+6、启动或者重启服务
+7、从机安装subversion
+8、测试
+
+一、检查是否已经有svn
+
+如果没有安装就会是下面的样子，提示找不到命令。
 ```shell
-svn --version
+[root@localhost ~]# svnserve --version
+-bash: svnserve: command not found
 ```
 
-如果 Subversion 客户端没有安装，命令将报告svn命令找不到的错误。
-
+如果已经安装，会显示版本信息：
 ```shell
-[tg@centos6 ~]$ svn --version
-bash: svn: command not found
+[root@localhost ~]#  svnserve --version
+svnserve, version 1.6.11 (r934486)
+   compiled Aug 17 2015, 08:37:43
+
+Copyright (C) 2000-2009 CollabNet.
+Subversion is open source software, see http://subversion.tigris.org/
+This product includes software developed by CollabNet (http://www.Collab.Net/).
+
+The following repository back-end (FS) modules are available:
+
+* fs_base : Module for working with a Berkeley DB repository.
+* fs_fs : Module for working with a plain file (FSFS) repository.
+
+Cyrus SASL authentication is available.
 ```
 
-我们可以使用 yum install subversion 命令进行安装。(ubuntu中使用apt-get install subversion来安装)
-
+二、安装
+在Linux下安装的是subversion，直接用yum 安装即可。
 ```shell
-[tg@centos6 root]$ su -
-密码：
-[root@centos6 ~]# yum install subversion
-已加载插件：fastestmirror, security
-设置安装进程
-Loading mirror speeds from cached hostfile
- * base: mirrors.aliyun.com
- * epel: mirrors.neusoft.edu.cn
- * extras: mirrors.zju.edu.cn
- * updates: mirrors.aliyun.com
-解决依赖关系
---&gt; 执行事务检查
-...
+[root@localhost ~]#
+[root@localhost ~]# yum install -y subversion
 ```
 
-安装成功之后，执行 svn --version 命令。
-
+三、检查安装是否成功
+同样用的是 svnserve –version成功安装会显示版本信息
 ```shell
-[tg@localhost ~]$ svn --version
-svn，版本 1.7.14 (r1542130)
-   编译于 Apr 11 2018，02:40:28
-
-版权所有 (C) 2013 Apache 软件基金会。
-此软件包含了许多人的贡献，请查看文件 NOTICE 以获得更多信息。
-Subversion 是开放源代码软件，请参阅 http://subversion.apache.org/ 站点。
-
-可使用以下的版本库访问模块: 
-
-* ra_neon : 通过 WebDAV 协议使用 neon 访问版本库的模块。
-  - 处理“http”方案
-  - 处理“https”方案
-* ra_svn : 使用 svn 网络协议访问版本库的模块。  - 使用 Cyrus SASL 认证
-  - 处理“svn”方案
-* ra_local : 访问本地磁盘的版本库模块。
-  - 处理“file”方案
+[root@localhost ~]# svnserve --version
 ```
 
-## SVN启动模式
-
-首先,在服务端进行SVN版本库的相关配置
-
-手动新建版本库目录
-
+四、创建svn资源仓库
+配置文件就是在这一步生成。
 ```shell
-[tg@localhost /]$ sudo mkdir /opt/svn
+[root@localhost ~]# svnadmin create /svndir
+[root@localhost ~]# cd /svndir/
+[root@localhost svndir]# ls
+conf  db  format  hooks  locks  README.txt
+[root@localhost svndir]# cd conf/
+[root@localhost conf]# ls
+authz  passwd  svnserve.conf
 ```
 
-利用svn命令创建版本库
-
+五、新增用户及密码，配置权限
+已经看到在仓库下面生成了三个文件
+authz #权限配置文件
+passwd #用户名密码文件
+svnserve.conf #资源库配置文件
 ```shell
-[tg@localhost /]$ sudo svnserver -d -r /opt/svn/tg
+[root@localhost conf]# vim passwd
+### This file is an example password file for svnserve.
+### Its format is similar to that of svnserve.conf. As shown in the
+### example below it contains one section labelled [users].
+### The name and password for each user follow, one account per line.
+
+[users]
+# harry = harryssecret
+# sally = sallyssecret
+yunwei = 123456
+~
 ```
 
-使用命令svnserve启动服务
-
-> ```
-> svnserve -d -r 目录 --listen-port 端口号
-> ```
-
-- **-r:** 配置方式决定了版本库访问方式。
-- **--listen-port:** 指定SVN监听端口，不加此参数，SVN默认监听3690
-
-由于-r 配置方式的不一样，SVN启动就可以有两种不同的访问方式
-
-方式一：-r直接指定到版本库(称之为单库svnserve方式)
-
-```shel
-[tg@localhost /]$ sudo svnserve -d -r /opt/svn/tg
-```
-
-在这种情况下，一个svnserve只能为一个版本库工作。
-
-authz配置文件中对版本库权限的配置应这样写：
-
+新增一行：
+yunwei = 123456
+新增用户“yunwei”，密码是“123456”
 ```shell
-[tg@localhost /]$ sudo vim /opt/svn/tg/conf/authz
-...
+[root@localhost conf]# vim authz
+
 
 [groups]
-admin=user1
-dev=user2
+# harry_and_sally = harry,sally
+# harry_sally_and_joe = harry,sally,&joe
+
 [/]
-@admin=tg
-user2=t
+* = r
+  @admin = rw
+  dangerman =
+
+[svndir:/]
+@admin = rw
 ```
 
+在[groups]下面加入：
+* = r #所有用户有读权限
+  dangerman = ##危险分子？什么是危险分子？没有任何权限
+
+[svndir:/] ###定义目录，项目的根目录
+* = rw
+```shell
+[root@localhost conf]# vim svnserve.conf
+```
+
+这个配置文件打开下面几行前面的注释，删除最前面的空格：
+anon-access = read
+auth-access = write
+password-db = passwd
+authz-db = authz
+realm = My First Repository
+
+六、启动或者重启服务
+```shell
+[root@localhost conf]# /etc/init.d/svnserve start
+Starting svnserve:                                     [  OK  ]
+```
+
+如果要指定目录要加参数：
+```shell
+[root@localhost svndir]# mkdir /svndir/svn
+[root@localhost svndir]# svnserve -d -r /svndir/svn  ####（只是看一下可以指定目录，这个实验不需要）
+svnserve: Can't bind server socket: Address already in use
+```
+
+问题来了！！！问题来了：
+显示Address already in use
+
+原因在这里：svnserve -d -r /svndir/svn 这条命令就是指定目录的启动。但是前面已经启动一次了。解决办法：
+```shell
+[root@localhost svndir]# /etc/init.d/svnserve stop
+Stopping svnserve:                                         [  OK  ]
+[root@localhost svndir]# svnserve -d -r /svndir/
+[root@localhost svndir]# ls
+conf  db  format  hooks  locks  README.txt 
+[root@localhost svndir]# netstat -antlp | grep svn
+tcp        0      0 0.0.0.0:3690                0.0.0.0:*                   LISTEN      5045/svnserve
+```
+
+七、测试，从机安装subversion
+在次从机安装也安装一个subversion 用来测试。
+
+注:
+服务主机：192.168.1.65
+从机：192.168.1.121
+
+在从机上checkout 根目录
+```shell
+[root@localhost ~]# svn checkout svn://192.168.1.65/svndir/
+Checked out revision 0.
+```
+
+需要注意的这里check的目录跟服务主机里面定义的[svndir]要一样。
+```shell
+[root@localhost ~]# svn checkout svn://192.168.1.65/svndir/
+svn: URL 'svn://192.168.1.65/svndir' doesn't exist
+```
+
+如果出现在这个报错，就要检查服务主机的auth配置文件了：
+如果配置文件的的目录指定的是[svndir：/]，而且svndir的目录在根下（/svndir）
+那启动的时候即嫑指定目录直接用/etc/init.d/svnserve start 启动即可。我们这里目录符合默认目录，不用指定了。直接用/etc/init.d/svnserve start，或者不用指定目录。
+svnserve -d -r /svndir/ 这表示指定目录到/svndir/
+目录不对应会报错。
+
+7.1：在从机上从机：192.168.1.121上提交
+```shell
+[root@localhost ~]# ls
+Desktop    Downloads  Pictures  svndir     Videos
+Documents  Music      Public    Templates
+[root@localhost ~]# cd svndir/
+[root@localhost svndir]# ls
+[root@localhost svndir]# touch xiao
+```
+```shell
+[root@localhost svndir]# ls
+xiao
+[root@localhost svndir]# pwd
+/root/svndir
+[root@localhost svndir]# ls
+xiao
+[root@localhost svndir]# svn add /root/svndir/xiao
+A         /root/svndir/xiao
+```
+```shell
+[root@localhost svndir]# svn commit /root/svndir/xiao -m 1
+Authentication realm: <svn://192.168.1.65:3690> My First Repository
+Password for 'root':
+Authentication realm: <svn://192.168.1.65:3690> My First Repository
+Username: ^Csvn: Commit failed (details follow):
+  n: Caught signal
+[root@localhost svndir]# svn commit /root/svndir/xiao -m 1
+Authentication realm: <svn://192.168.1.65:3690> My First Repository
+Password for 'root':
+Authentication realm: <svn://192.168.1.65:3690> My First Repository
+Username: yunwei
+Password for 'yunwei':
+
+-----------------------------------------------------------------------
+ATTENTION!  Your password for authentication realm:
+
+   <svn://192.168.1.65:3690> My First Repository
+
+can only be stored to disk unencrypted!  You are advised to configure
+your system so that Subversion can store passwords encrypted, if
+possible.  See the documentation for details.
+
+You can avoid future appearances of this warning by setting the value
+of the 'store-plaintext-passwords' option to either 'yes' or 'no' in
+'/root/.subversion/servers'.
+-----------------------------------------------------------------------
+Store password unencrypted (yes/no)? yes
+Adding         xiao
+Transmitting file data .
+Committed revision 1.
+```
+
+注意：
+1、提交代码前，必须先cd到/root/svndir/（就是checkout下来的）目录里；
+2、服务器上没有的文件，在客户端需要先add预提交，再commit，如果服务器端已有的文件，直接commit
+
+预提交的命令：
+```shell
+ svn add /root/svndir/xiao
+```
+
+提交的命令：
+```shell
+svn commit /root/svndir/xiao -m 1
+```
+
+出现committed revision 1 提交成功了。
+
+到服务端查看有没有提交成功：
+服务主机:192.168.1.65
+```shell
+[root@localhost svndir]# svn checkout svn://192.168.1.65/svndir/
+A    svndir/xiao
+Checked out revision 1.
+[root@localhost svndir]# ls
+conf  db  format  hooks  locks  README.txt  svn  svndir
+[root@localhost svndir]# cd svndir/
+[root@localhost svndir]# ls
+xiao
+```
+
+接下来测试更新：
+
+从机：192.168.1.121：
+```shell
+[root@localhost svndir]# ls
+xiao
+[root@localhost svndir]# vim xiao
+
+hello koby bryant !
+~
+```
+
+修改了xiao 这个文件的内容，之前是空文件，现在加上一行内容。
+然后重新提交：
+```shell
+[root@localhost svndir]# svn commit /root/svndir/xiao -m 2
+Sending        xiao
+Transmitting file data .
+Committed revision 2.
+```
+
+服务器主机：192.168.1.65
+```shell
+[root@localhost svndir]# svn up
+​     xiao
+Updated to revision 2.
+[root@localhost svndir]# ls
+xiao
+[root@localhost svndir]# vim xiao
+hello koby bryant !
+~
+```
+
+内容已经更改。
+
+因为是更改内容，目录和文件已经有了，所以不用checkout了，直接svn up就可以了。
+
+7.2、在服务器主机：192.168.1.65上提交
+```shell
+[root@localhost svndir]# ls
+xiao  yao
+[root@localhost svndir]# pwd
+/svndir/svndir
+[root@localhost svndir]# svn add /svndir/svndir/yao
+A         /svndir/svndir/yao
+[root@localhost svndir]# svn commit /svndir/svndir/yao -m 3
+Authentication realm: <svn://192.168.1.65:3690> My First Repository
+Password for 'root':
+Authentication realm: <svn://192.168.1.65:3690> My First Repository
+Username: yunwei
+Password for 'yunwei':
+
+-----------------------------------------------------------------------
+ATTENTION!  Your password for authentication realm:
+
+   <svn://192.168.1.65:3690> My First Repository
+
+can only be stored to disk unencrypted!  You are advised to configure
+your system so that Subversion can store passwords encrypted, if
+possible.  See the documentation for details.
+
+You can avoid future appearances of this warning by setting the value
+of the 'store-plaintext-passwords' option to either 'yes' or 'no' in
+'/root/.subversion/servers'.
+-----------------------------------------------------------------------
+Store password unencrypted (yes/no)? yes
+Adding         yao
+Transmitting file data .
+Committed revision 3.
+```
+
+注意：还是要cd到/svndir/svndir里面再预提交，然后提交。
+显示Committed revision 3.就说明提交成功
+
+到从机：192.168.1.121上更新看效果：
+```shell
+[root@localhost svndir]# svn up
+A    yao
+Updated to revision 3.
+[root@localhost svndir]# ls
+xiao  yao
+[root@localhost svndir]# cat yao
+hello rayallen
+```
+
+上面提交不管是在服务器主机上还是在从机上，都需要输入服务器主机的root用户密码，以及在conf文件里面设置的用户和密码。上面测试是用的文件测试，目录同样可以。
+比如：
+从机上：192.168.1.121
+```shell
+[root@localhost svndir]# mkdir xiaoyao
+[root@localhost svndir]# ls
+xiao  xiaoyao  yao
+[root@localhost svndir]# svn add /root/svndir/xiaoyao/
+A         /root/svndir/xiaoyao
+[root@localhost svndir]# svn commit /root/svndir/xiaoyao/ -m 4
+Adding         xiaoyao
+
+Committed revision 4.
+```
+
+服务器主机上：192.168.1.65
+```shell
+[root@localhost svndir]# svn up
+A    xiaoyao
+Updated to revision 4.
+[root@localhost svndir]# ls
+xiao  xiaoyao  yao
+```
+至此，svn的安装配置测试就成功了
+
+### 参考链接
+
+https://blog.csdn.net/weixin_37998647/article/details/78686246
+
+https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000
+
+https://www.imooc.com/learn/109
