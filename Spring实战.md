@@ -741,3 +741,11 @@ AspectJ与之相反。虽然AspectJ现在支持基于注解的切面，但是Asp
 | \<aop:declare-parents>            | 为被通知的对象引入额外的接口，并透明地实现 |
 | \<aop:pointcut>            | 定义切点 |
 
+# 构建Spring Web应用程序
+
+## Spring  MVC 起步
+
+### 跟踪Spring MVC的请求
+
+![](image/34.jpg)
+
