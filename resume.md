@@ -9,8 +9,8 @@
 # 个人信息
 
  - 刘雨/男/1996 
- - 本科/宿州学院软件工程
- - 技术博客：https://blog.csdn.net/tangzongpi6936
+ - 本科/宿州学院/软件工程/2020届
+ - 技术博客：http://www.cnblogs.com/Tu9oh0st/
  - Github：https://github.com/TUGOhost
  - 荣誉获奖：
    - 2017/05 2017年全国大学生安全与对抗技术个人挑战赛二等奖
