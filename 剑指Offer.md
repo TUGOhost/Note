@@ -423,3 +423,243 @@ public class Solution {
 }
 ```
 
+## 二进制中1的个数
+
+### 题目描述
+
+输入一个整数，输出该数二进制表示中1的个数。其中负数用补码表示。
+
+### 分析
+用1（1自身左移运算，其实后来就不是1了）和n的每位进行位与，来判断1的个数
+### 贴出代码
+```java
+public class Solution {
+    public int NumberOf1(int n) {
+        int count = 0;
+        while(n != 0){
+            ++count;
+            n = (n -1) & n;
+        }
+        return count;
+    }
+}
+```
+
+## 跳台阶
+### 题目描述
+一只青蛙一次可以跳上1级台阶，也可以跳上2级。求该青蛙跳上一个n级的台阶总共有多少种跳法（先后次序不同算不同的结果）。
+### 分析
+对于本题,前提只有 一次 1阶或者2阶的跳法。
+
+a.如果两种跳法，1阶或者2阶，那么假定第一次跳的是一阶，那么剩下的是n-1个台阶，跳法是f(n-1);
+b.假定第一次跳的是2阶，那么剩下的是n-2个台阶，跳法是f(n-2)
+c.由a\b假设可以得出总跳法为: f(n) = f(n-1) + f(n-2) 
+d.然后通过实际的情况可以得出：只有一阶的时候 f(1) = 1 ,只有两阶的时候可以有 f(2) = 2
+e.可以发现最终得出的是一个斐波那契数列：
+
+              | 1, (n=1)
+
+f(n) =     | 2, (n=2)
+
+              | f(n-1)+f(n-2) ,(n>2,n为整数)
+### 贴出代码
+```java
+public class Solution {
+    public int JumpFloor(int target) {
+        if(target <= 0){
+            return -1;
+        }else if(target == 1){
+            return 1;
+        }else if(target == 2){
+            return 2;
+        }else{
+            return JumpFloor(target - 1) + JumpFloor(target -2);
+        }
+    }
+}
+```
+## 平衡二叉树
+### 题目描述
+输入一棵二叉树，判断该二叉树是否是平衡二叉树。
+### 分析
+从下往上遍历，如果子树是平衡二叉树，则返回子树的高度；如果发现子树不是平衡二叉树，则直接停止遍历，这样至多只对每个结点访问一次。
+### 贴出代码
+```java
+public class Solution {
+    public boolean IsBalanced_Solution(TreeNode root) {
+        return getDepth(root) != -1;
+    }
+    
+    private int getDepth(TreeNode root) {
+        if (root == null) return 0;
+        int left = getDepth(root.left);
+        if (left == -1) return -1;
+        int right = getDepth(root.right);
+        if (right == -1) return -1;
+        return Math.abs(left - right) > 1 ? -1 : 1 + Math.max(left, right);
+    }
+}
+```
+## 整数中1出现的次数（从1到n整数中1出现的次数）
+### 题目描述
+求出1~13的整数中1出现的次数,并算出100~1300的整数中1出现的次数？为此他特别数了一下1~13中包含1的数字有1、10、11、12、13因此共出现6次,但是对于后面问题他就没辙了。ACMer希望你们帮帮他,并把问题更加普遍化,可以很快的求出任意非负整数区间中1出现的次数（从1 到 n 中1出现的次数）。
+### 分析
+设N = abcde ,其中abcde分别为十进制中各位上的数字。
+如果要计算百位上1出现的次数，它要受到3方面的影响：百位上的数字，百位以下（低位）的数字，百位以上（高位）的数字。
+① 如果百位上数字为0，百位上可能出现1的次数由更高位决定。比如：12013，则可以知道百位出现1的情况可能是：100~199，1100~1199,2100~2199，，...，11100~11199，一共1200个。可以看出是由更高位数字（12）决定，并且等于更高位数字（12）乘以 当前位数（100）。
+② 如果百位上数字为1，百位上可能出现1的次数不仅受更高位影响还受低位影响。比如：12113，则可以知道百位受高位影响出现的情况是：100~199，1100~1199,2100~2199，，....，11100~11199，一共1200个。和上面情况一样，并且等于更高位数字（12）乘以 当前位数（100）。但同时它还受低位影响，百位出现1的情况是：12100~12113,一共114个，等于低位数字（113）+1。
+③ 如果百位上数字大于1（2~9），则百位上出现1的情况仅由更高位决定，比如12213，则百位出现1的情况是：100~199,1100~1199，2100~2199，...，11100~11199,12100~12199,一共有1300个，并且等于更高位数字+1（12+1）乘以当前位数（100）。
+### 贴出代码
+```java
+public class Solution {
+    public int NumberOf1Between1AndN_Solution(int n) {
+        int count = 0;//1的个数
+        int i = 1;//当前位
+        int current = 0,after = 0,before = 0;
+        while((n/i)!= 0){           
+            current = (n/i)%10; //高位数字
+            before = n/(i*10); //当前位数字
+            after = n-(n/i)*i; //低位数字
+            //如果为0,出现1的次数由高位决定,等于高位数字 * 当前位数
+            if (current == 0)
+                count += before*i;
+            //如果为1,出现1的次数由高位和低位决定,高位*当前位+低位+1
+            else if(current == 1)
+                count += before * i + after + 1;
+            //如果大于1,出现1的次数由高位决定,//（高位数字+1）* 当前位数
+            else{
+                count += (before + 1) * i;
+            }    
+            //前移一位
+            i = i*10;
+        }
+        return count;
+    }
+}
+```
+## 两个链表的第一个公共结点
+### 题目描述
+输入两个链表，找出它们的第一个公共结点。
+### 分析
+利用HashMap的特性。
+### 贴出代码
+```java
+/*
+public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}*/
+import java.util.HashMap;
+public class Solution {
+    public ListNode FindFirstCommonNode(ListNode pHead1, ListNode pHead2) {
+        ListNode current1 = pHead1;
+        ListNode current2 = pHead2;
+ 
+ 
+        HashMap<ListNode, Integer> hashMap = new HashMap<ListNode, Integer>();
+        while (current1 != null) {
+            hashMap.put(current1, null);
+            current1 = current1.next;
+        }
+        while (current2 != null) {
+            if (hashMap.containsKey(current2))
+                return current2;
+            current2 = current2.next;
+        }
+ 
+        return null;
+ 
+    }
+}
+```
+## 旋转数组的最小数字
+### 题目描述
+把一个数组最开始的若干个元素搬到数组的末尾，我们称之为数组的旋转。 输入一个非减排序的数组的一个旋转，输出旋转数组的最小元素。 例如数组{3,4,5,1,2}为{1,2,3,4,5}的一个旋转，该数组的最小值为1。 NOTE：给出的所有元素都大于0，若数组大小为0，请返回0。
+### 分析
+采用二分法解答这个问题，
+mid = low + (high - low)/2
+需要考虑三种情况：
+(1)array[mid] > array[high]:
+出现这种情况的array类似[3,4,5,6,0,1,2]，此时最小数字一定在mid的右边。
+low = mid + 1
+(2)array[mid] == array[high]:
+出现这种情况的array类似 [1,0,1,1,1] 或者[1,1,1,0,1]，此时最小数字不好判断在mid左边
+还是右边,这时只好一个一个试 ，
+high = high - 1
+(3)array[mid] < array[high]:
+出现这种情况的array类似[2,2,3,4,5,6,6],此时最小数字一定就是array[mid]或者在mid的左
+边。因为右边必然都是递增的。
+high = mid
+注意这里有个坑：如果待查询的范围最后只剩两个数，那么mid 一定会指向下标靠前的数字
+比如 array = [4,6]
+array[low] = 4 ;array[mid] = 4 ; array[high] = 6 ;
+如果high = mid - 1，就会产生错误， 因此high = mid
+但情形(1)中low = mid + 1就不会错误
+### 贴出代码
+```java
+import java.util.ArrayList;
+public class Solution {
+    public int minNumberInRotateArray(int [] array) {
+        int low = 0;
+        int high = array.length - 1;
+        while(low < high){
+            int mid = low + (high - low) / 2;
+            if(array[mid] > array[high]){
+                low = mid + 1;
+            }else if(array[mid] == array[high]){
+                high = high - 1;
+            }else{
+                high = mid;
+            }
+        }
+        return array[low];
+    }
+}
+```
+## 数值的整数次方
+### 题目描述
+给定一个double类型的浮点数base和int类型的整数exponent。求base的exponent次方。
+### 分析
+
+### 贴出代码
+
+## 包含min函数的栈
+### 题目描述
+定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的min函数（时间复杂度应为O（1））。
+###分析
+
+### 贴出代码
+
+## 字符流中第一个不重复的字符
+### 题目描述
+请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
+输出描述：
+> 如果当前字符流没有存在出现一次的字符，返回#字符。
+###分析
+
+### 贴出代码
+
+## 链表中环的入口结点
+### 题目描述
+给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
+###分析
+
+### 贴出代码
+
+## 左旋转字符串
+### 题目描述
+汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，即“XYZdefabc”。是不是很简单？OK，搞定它！
+###分析
+
+### 贴出代码
+
+## 对称的二叉树
+### 题目描述
+请实现一个函数，用来判断一颗二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。
+###分析
+
+### 贴出代码
