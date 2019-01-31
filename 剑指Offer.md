@@ -624,16 +624,94 @@ public class Solution {
 ### 题目描述
 给定一个double类型的浮点数base和int类型的整数exponent。求base的exponent次方。
 ### 分析
-
+递归：n为偶数，a^n=a^n/2*a^n/2;n为奇数，a^n=（a^（n-1）/2）*（a^（n-1/2））*a
 ### 贴出代码
-
+```java
+public class Solution {
+    public double Power(double base, int exponent) {
+        int n = Math.abs(exponent);
+        if(n == 0){
+            return 1;
+        }
+        if(n == 1){
+            return base;
+        }
+        double result = Power(base,n>>1);
+        result *= result;
+        if((n&1) == 1){
+            result *= base;
+        }
+        if(exponent < 0){
+            result = 1/result;
+        }
+        return result;
+  }
+}
+```
 ## 包含min函数的栈
 ### 题目描述
 定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的min函数（时间复杂度应为O（1））。
 ###分析
 
 ### 贴出代码
+```java
+import java.util.Stack;
+import java.util.Arrays;
 
+public class Solution {
+
+    private int size;
+    private int min = Integer.MAX_VALUE;
+    private Stack<Integer> minStack = new Stack<Integer>();
+    private Integer[] elements = new Integer[10];
+
+    public void push(int node) {
+        ensureCapacity(size+1);
+        elements[size++] = node;
+        if (node <= min){
+            minStack.push(node);
+            min = minStack.peek();
+        }else {
+            minStack.push(min);
+        }
+    }
+
+    private void ensureCapacity(int size ){
+        int len = elements.length;
+        if(size > len){
+            int newLen = (len * 3) / 2 + 1;
+            elements = Arrays.copyOf(elements,newLen);
+        }
+    }
+
+    public void pop() {
+        Integer top = top();
+        if(top != null){
+            elements[size - 1] = (Integer) null;
+        }
+        size--;
+        minStack.pop();
+        min = minStack.peek();
+    }
+
+    public int top() {
+        if(!empty()){
+            if(size - 1 >= 0){
+                return  elements[size - 1];
+            }
+        }
+        return (Integer) null;
+    }
+
+    public boolean empty(){
+        return size == 0;
+    }
+
+    public int min() {
+        return min;
+    }
+}
+```
 ## 字符流中第一个不重复的字符
 ### 题目描述
 请实现一个函数用来找出字符流中第一个只出现一次的字符。例如，当从字符流中只读出前两个字符"go"时，第一个只出现一次的字符是"g"。当从该字符流中读出前六个字符“google"时，第一个只出现一次的字符是"l"。
