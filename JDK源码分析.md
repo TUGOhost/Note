@@ -3120,3 +3120,4 @@ public V get(Object key) {
 1. 判断table是否为空，如果为空，直接返回null。
 2. 计算key的hash值，并获取指定table中指定位置的Node节点，通过遍历链表或则树结构找到对应的节点，返回value值。
 
+# String
