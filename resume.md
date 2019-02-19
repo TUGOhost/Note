@@ -10,7 +10,7 @@
 
  - 刘雨/男/1996 
  - 本科/宿州学院/软件工程/2020届
- - 技术博客：http://www.cnblogs.com/Tu9oh0st/
+ - 技术博客：https://www.cnblogs.com/Tu9oh0st/
  - Github：https://github.com/TUGOhost
  - 荣誉获奖：
    - 2017/05 2017年全国大学生安全与对抗技术个人挑战赛二等奖
@@ -47,9 +47,7 @@
 - 熟悉设计模式。
 - 掌握SpringMVC、Spring、Mybatis等企业主流开发框架。
 - 熟练应用MySQL关系型数据库及redis非关系型数据库等技术。
-- 熟悉Javascript、jquery、ajax等前端技术。
 - 熟悉GIT、MAVEN工具，能够使用MAVEN构建项目。
-- 熟悉Linux，SHELL编程，服务器环境搭建及项目部署。
 
 ---
 
