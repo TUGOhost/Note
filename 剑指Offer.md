@@ -1,7 +1,3 @@
-
-
-
-
 # 前言
 
 为了不让自己做公司笔试题时做不出来，所以刷剑指Offer
@@ -52,14 +48,6 @@ public class Solution1 {
         return Rleft > Rright ? Rleft + 1 : Rright + 1;
     }
 }
-//评论中很简短的一个写法
-class Solution {
-public:
-    int TreeDepth(TreeNode* pRoot){
-        if(!pRoot) return 0 ;
-            return max(1+TreeDepth(pRoot->left), 1+TreeDepth(pRoot->right));
-    }
-};
 ```
 
 ## 不用加减乘除做加法
@@ -718,26 +706,345 @@ public class Solution {
 输出描述：
 > 如果当前字符流没有存在出现一次的字符，返回#字符。
 ###分析
-
+一个字符占8位，因此不会超过256个，可以申请一个256大小的数组来实现一个简易的哈希表。时间复杂度为O(n)，空间复杂度O(n).
 ### 贴出代码
-
+```java
+public class Solution {
+    int[] hashtable = new int[256];
+    StringBuffer s = new StringBuffer();
+    //Insert one char from stringstream
+    public void Insert(char ch)
+    {
+        s.append(ch);
+        if(hashtable[ch] == 0){
+            hashtable[ch] = 1;
+        }else{
+            hashtable[ch] += 1;
+        }
+    }
+  //return the first appearence once char in current stringstream
+    public char FirstAppearingOnce()
+    {
+        char[] str = s.toString().toCharArray();
+        for(char c : str){
+            if(hashtable[c] == 1){
+                return c;
+            }
+        }
+        return '#';
+    }
+}
+```
 ## 链表中环的入口结点
 ### 题目描述
 给一个链表，若其中包含环，请找出该链表的环的入口结点，否则，输出null。
 ###分析
-
+如果链表中环 有n个结点，指针P1在链表上向前移动n步，然后两个指针以相同的速度向前移动。
+当第二个指针指向环的入口结点时，第一个指针已经围绕着环走了一圈又回到了入口结点。
+所以首先要得到环中结点的数目。
 ### 贴出代码
+```java
+/*
+ public class ListNode {
+    int val;
+    ListNode next = null;
 
+    ListNode(int val) {
+        this.val = val;
+    }
+}
+*/
+
+public class Solution {
+    
+    public static ListNode meetingNode(ListNode head){
+        if(head == null){
+            return null;
+        }
+
+        ListNode slow = head.next;
+        if(slow == null){
+            return null;
+        }
+
+        ListNode fast = slow.next;
+        while(slow != null && fast != null){
+            if(slow == fast){
+                return fast;
+            }
+            slow = slow.next;
+            fast = fast.next;
+
+            if(fast != slow){
+                fast = fast.next;
+            }
+        }
+        return null;
+    }
+
+    public ListNode EntryNodeOfLoop(ListNode pHead)
+    {
+        ListNode meetingNode = meetingNode(pHead);
+        if(meetingNode == null){
+            return null;
+        }
+
+        int nodesInLoop = 1;
+        ListNode p1 = meetingNode;
+        while (p1.next != meetingNode){
+            p1 = p1.next;
+            ++nodesInLoop;
+        }
+
+        p1 = pHead;
+        for (int i = 0; i < nodesInLoop; i++){
+            p1 = p1.next;
+        }
+
+        ListNode p2 = pHead;
+        while (p1 != p2){
+            p1 = p1.next;
+            p2 = p2.next;
+        }
+        return p1;
+    }
+}
+```
 ## 左旋转字符串
 ### 题目描述
 汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，即“XYZdefabc”。是不是很简单？OK，搞定它！
 ###分析
-
+看题。
 ### 贴出代码
-
+```java
+public class Solution {
+    public String LeftRotateString(String str,int n) {
+        if(str == null || n < 0 || n > str.length()){
+            return "";
+        }
+        StringBuffer sb = new StringBuffer(str);
+        sb.append(sb.substring(0, n));
+        return sb.substring(n, sb.length());
+    }
+}
+```
 ## 对称的二叉树
 ### 题目描述
 请实现一个函数，用来判断一颗二叉树是不是对称的。注意，如果一个二叉树同此二叉树的镜像是同样的，定义其为对称的。
 ###分析
+首先根节点以及其左右子树，左子树的左子树和右子树的右子树相同左子树的右子树和右子树的左子树相同即可，采用递归。
+### 贴出代码
+```java
+/*
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+*/
+public class Solution {
+    boolean isSymmetrical(TreeNode pRoot)
+    {
+        if(pRoot == null){
+            return true;
+        }
+        return comRoot(pRoot.left,pRoot.right);
+    }
+
+    boolean comRoot(TreeNode left, TreeNode right){
+        if(left == null){
+            return right == null;
+        }
+        if(right == null){
+            return false;
+        }
+        if(left.val != right.val){
+            return false;
+        }
+        return comRoot(left.right, right.left) && comRoot(left.left, right.right);
+    }
+}
+```
+
+## 把二叉树打印成多行
+### 题目描述
+从上到下按层打印二叉树，同一层结点从左至右输出。每一层输出一行。
+### 分析
+利用递归的方法进行先序遍历，传递深度，递归深入一层扩容一层数组，先序遍历又保证了同层节点按从左到右入数组
+### 贴出代码
+```java
+import java.util.ArrayList;
+
+
+/*
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+*/
+public class Solution {
+    ArrayList<ArrayList<Integer> > Print(TreeNode pRoot) {
+        ArrayList<ArrayList<Integer>> list = new ArrayList<>();
+        depth(pRoot,1,list);
+        return list;
+    }
+    
+    public void depth(TreeNode root, int depth, ArrayList<ArrayList<Integer>> list){
+        if(root == null){
+            return;
+        }
+        if(depth > list.size()){
+            list.add(new ArrayList<Integer>());
+        }
+        list.get(depth - 1).add(root.val);
+        
+        depth(root.left, depth + 1, list);
+        depth(root.right, depth + 1, list);
+    }
+    
+}
+```
+
+## 孩子们的游戏(圆圈中最后剩下的数)
+### 题目描述
+每年六一儿童节,牛客都会准备一些小礼物去看望孤儿院的小朋友,今年亦是如此。HF作为牛客的资深元老,自然也准备了一些小游戏。其中,有个游戏是这样的:首先,让小朋友们围成一个大圈。然后,他随机指定一个数m,让编号为0的小朋友开始报数。每次喊到m-1的那个小朋友要出列唱首歌,然后可以在礼品箱中任意的挑选礼物,并且不再回到圈中,从他的下一个小朋友开始,继续0...m-1报数....这样下去....直到剩下最后一个小朋友,可以不用表演,并且拿到牛客名贵的“名侦探柯南”典藏版(名额有限哦!!^_^)。请你试着想下,哪个小朋友会得到这份礼品呢？(注：小朋友的编号是从0到n-1)
+### 分析
+题目大概是让我们返回得到柯南的小朋友序号，所以，将小朋友序号存入ArrayList中，在根据坐标(m - 1)来移除唱歌挑选礼物的小朋友，最终一个循环就可以找到我们要找的小朋友
+### 贴出代码
+```java
+import java.util.ArrayList;
+public class Solution {
+    public int LastRemaining_Solution(int n, int m) {
+        if(m == 0 || n == 0){
+            return -1;
+        }
+        ArrayList<Integer> data = new ArrayList<Integer>();
+        for(int i = 0; i < n ; i++){
+            data.add(i);
+        }
+        int index = -1;
+        
+        while(data.size() > 1){
+            index = (index + m) % data.size(); // 此时index 等于 arraylist中的 m - 1位置
+            data.remove(index); // 移除唱歌的孩子
+            index--; // 因为原数组减去一个元素，坐标也相应减去1
+        }
+        return data.get(0); // 获得剩下的那个人就是能得到”名侦探柯南”典藏版
+    }
+}
+```
+## 数字在排序数组中出现的次数
+### 题目描述
+统计一个数字在排序数组中出现的次数。
+### 分析
+因为是一个排序数组，所以利用二分查找，找出第一个k值和最后一个k值，再相减差值+1就是出现的次数。
+### 贴出代码
+```java
+public class Solution {
+    public int GetNumberOfK(int [] array , int k) {
+        if(array == null || array.length == 0){
+            return 0;
+        }
+        int first = getFirstK(array, k, 0, array.length - 1);
+        int last = getLastK(array, k, 0, array.length - 1);
+        if(first == -1 || last == -1){
+            return 0;
+        }
+        else{
+            return last - first + 1;
+        }
+    }
+    
+    public int getFirstK(int[] array, int k, int start, int end){
+        while(start <= end){
+            int mid = (start + end) / 2;
+            if(k < array[mid]){
+                end = mid - 1;
+            }else if(k > array[mid]){
+                start = mid + 1;
+            }
+            else{
+                if((mid > 0 && array[mid - 1] != k) || mid == 0){
+                    return mid;
+                }else{
+                    end = mid - 1;
+                }
+            }
+        }
+        return -1;
+    }
+    
+    public int getLastK(int[] array, int k, int start, int end){
+        while(start <= end){
+            int mid = (start + end) / 2;
+            if(k < array[mid]){
+                end = mid - 1;
+            }else if(k > array[mid]){
+                start = mid + 1;
+            }
+            else{
+                if((mid < array.length - 1 && array[mid + 1] != k) || mid == array.length -1){
+                    return mid;
+                }
+                else{
+                    start = mid + 1;
+                }
+            }
+        }
+        return -1;
+    }
+}
+```
+## 二叉树的下一个结点
+### 题目描述
+给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
+### 分析
 
 ### 贴出代码
+```java
+/*
+public class TreeLinkNode {
+    int val;
+    TreeLinkNode left = null;
+    TreeLinkNode right = null;
+    TreeLinkNode next = null;
+
+    TreeLinkNode(int val) {
+        this.val = val;
+    }
+}
+*/
+public class Solution {
+    public TreeLinkNode GetNext(TreeLinkNode pNode)
+    {
+        if(pNode == null){
+            return pNode;
+        }
+        if(pNode.right != null){
+            pNode = pNode.right;
+            while(pNode.left != null){
+                pNode = pNode.left;
+            }
+            return pNode;
+        }else if(pNode.next != null && pNode.next.left == pNode){
+            return pNode.next;
+        }else if(pNode.next != null && pNode.next.right == pNode){
+            while(pNode.next != null && pNode.next.left != pNode){
+                pNode = pNode.next;
+            }
+            return pNode.next;
+        }else{
+            return pNode.next;
+        }
+    }
+}
+```
