@@ -1008,7 +1008,10 @@ public class Solution {
 ### 题目描述
 给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。
 ### 分析
-
+分析二叉树的下一个节点，一共有以下情况：
+1.二叉树为空，则返回空；
+2.节点右孩子存在，则设置一个指针从该节点的右孩子出发，一直沿着指向左子结点的指针找到的叶子节点即为下一个节点；
+3.节点不是根节点。如果该节点是其父节点的左孩子，则返回父节点；否则继续向上遍历其父节点的父节点，重复之前的判断，返回结果。
 ### 贴出代码
 ```java
 /*
@@ -1048,3 +1051,346 @@ public class Solution {
     }
 }
 ```
+## 数组中只出现一次的数字
+### 题目描述
+一个整型数组里除了两个数字之外，其他的数字都出现了偶数次。请写程序找出这两个只出现一次的数字。
+### 分析
+先定义一个存两个数字的数组，先遍历array数组，找到不包含的两个数字，通过contains()来判断是否含有，含有则remove()。
+### 贴出代码
+```java
+//num1,num2分别为长度为1的数组。传出参数
+//将num1[0],num2[0]设置为返回结果
+import java.util.ArrayList;
+import java.util.List;
+public class Solution {
+    public void FindNumsAppearOnce(int [] array,int num1[] , int num2[]) {
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < array.length; i++){
+            if(!list.contains(String.valueOf(array[i]))){
+                list.add(String.valueOf(array[i]));
+            }else {
+                list.remove(String.valueOf(array[i]));
+            }
+        }
+        if (list.size() != 0){
+            num1[0] = Integer.valueOf(list.get(0));
+            num2[0] = Integer.valueOf(list.get(1));
+        }
+    }
+}
+```
+
+## 斐波那契数列
+### 题目描述
+大家都知道斐波那契数列，现在要求输入一个整数n，请你输出斐波那契数列的第n项（从0开始，第0项为0）。
+n<=39
+### 分析
+斐波那契数列：
+> F[n] = F[n - 1] + F[n -2]
+>
+采用尾递归，防止递归时栈溢出。
+### 贴出代码
+```java
+public class Solution {
+    public int Fibonacci(int n) {
+        return Fibonacci(n,0,1);
+    }
+    
+    private static int Fibonacci(int n,int acc1,int acc2){
+        if(n==0) return 0;
+        if(n==1) return acc2;
+        else  
+            return Fibonacci(n - 1, acc2, acc1 + acc2);
+    }
+}
+```
+
+## 和为S的两个数字
+### 题目描述
+输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的。
+
+**输出描述:**
+> 对应每个测试案例，输出两个数，小的先输出。
+### 分析
+由于是排序好的数组，所以左右逼近。
+### 贴出代码
+```java
+import java.util.ArrayList;
+public class Solution {
+    public ArrayList<Integer> FindNumbersWithSum(int [] array,int sum) {
+        ArrayList<Integer> list = new ArrayList<>();
+        if (array == null || array.length < 2){
+            return list;
+        }
+        int i = 0, j = array.length - 1;
+        while (i < j){
+            if (array[i] + array[j] == sum){
+                list.add(array[i]);
+                list.add(array[j]);
+                return list;
+            }else if (array[i] + array[j] > sum){
+                j --;
+            }else {
+                i ++;
+            }
+        }
+        return list;
+    }
+}
+```
+
+## 反转链表
+### 题目描述
+输入一个链表，反转链表后，输出新链表的表头。
+### 分析
+单链表的反转。
+### 贴出代码
+```java
+/*
+public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}*/
+public class Solution {
+    public ListNode ReverseList(ListNode head) {
+        if (head == null){
+            return null;
+        }
+        ListNode pre = null;
+        ListNode next = null;
+        while (head != null){
+            next = head.next;
+            head.next = pre;
+            pre = head;
+            head = next;
+        }
+        return pre;
+    }
+}
+```
+
+## 栈的压入、弹出序列
+### 题目描述
+输入两个整数序列，第一个序列表示栈的压入顺序，请判断第二个序列是否可能为该栈的弹出顺序。假设压入栈的所有数字均不相等。例如序列1,2,3,4,5是某栈的压入顺序，序列4,5,3,2,1是该压栈序列对应的一个弹出序列，但4,3,5,1,2就不可能是该压栈序列的弹出序列。（注意：这两个序列的长度是相等的）
+### 分析
+借用一个辅助的栈，遍历压栈顺序，先讲第一个放入栈中，这里是1，然后判断栈顶元素是不是出栈顺序的第一个元素，这里是4，很显然1≠4，所以我们继续压栈，直到相等以后开始出栈，出栈一个元素，则将出栈顺序向后移动一位，直到不相等，这样循环等压栈顺序遍历完成，如果辅助栈还不为空，说明弹出序列不是该栈的弹出顺序。
+
+举例：
+
+入栈1,2,3,4,5
+
+出栈4,5,3,2,1
+
+首先1入辅助栈，此时栈顶1≠4，继续入栈2
+
+此时栈顶2≠4，继续入栈3
+
+此时栈顶3≠4，继续入栈4
+
+此时栈顶4＝4，出栈4，弹出序列向后一位，此时为5，,辅助栈里面是1,2,3
+
+此时栈顶3≠5，继续入栈5
+
+此时栈顶5=5，出栈5,弹出序列向后一位，此时为3，,辅助栈里面是1,2,3
+
+….
+
+依次执行，最后辅助栈为空。如果不为空说明弹出序列不是该栈的弹出顺序。
+### 贴出代码
+```java
+import java.util.ArrayList;
+import java.util.Stack;
+public class Solution {
+    public boolean IsPopOrder(int [] pushA,int [] popA) {
+         if (pushA.length == 0 || popA.length == 0){
+            return false;
+        }
+        Stack<Integer> s = new Stack<>();
+        int popIndex = 0;
+        for (int i = 0; i < pushA.length; i++){
+            s.push(pushA[i]);
+            while (!s.empty() && s.peek() == popA[popIndex]){
+                s.pop();
+                popIndex ++;
+            }
+        }
+        return s.empty();
+    }
+}
+```
+
+## 数组中重复的数字
+### 题目描述
+在一个长度为n的数组里的所有数字都在0到n-1的范围内。 数组中某些数字是重复的，但不知道有几个数字是重复的。也不知道每个数字重复几次。请找出数组中任意一个重复的数字。 例如，如果输入长度为7的数组{2,3,1,0,2,5,3}，那么对应的输出是第一个重复的数字2。
+### 分析
+简单的包含问题。
+### 贴出代码
+```java
+public class Solution {
+    // Parameters:
+    //    numbers:     an array of integers
+    //    length:      the length of array numbers
+    //    duplication: (Output) the duplicated number in the array number,length of duplication array is 1,so using duplication[0] = ? in implementation;
+    //                  Here duplication like pointor in C/C++, duplication[0] equal *duplication in C/C++
+    //    这里要特别注意~返回任意重复的一个，赋值duplication[0]
+    // Return value:       true if the input is valid, and there are some duplications in the array number
+    //                     otherwise false
+    public boolean duplicate(int numbers[],int length,int [] duplication) {
+        boolean[] k = new boolean[length];
+		for(int i = 0; i < k.length; i++) {
+			if(k[numbers[i]] == true) {
+				duplication[0] = numbers[i];
+				return true;
+			}
+			k[numbers[i]] = true;
+		}
+		return false;
+    }
+}
+```
+
+## 二叉搜索树与双向链表
+### 题目描述
+输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的双向链表。要求不能创建任何新的结点，只能调整树中结点指针的指向。
+### 分析
+直接用中序遍历
+### 贴出代码
+```java
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+public class Solution {
+    TreeNode head = null;
+	TreeNode realHead = null;
+	
+	public TreeNode Convert(TreeNode pRootOfTree) {
+        ConvertSub(pRootOfTree);
+        return realHead;
+    }
+	
+	private void ConvertSub(TreeNode pRootOfTree) {
+		if(pRootOfTree == null) {
+			return;
+		}
+		ConvertSub(pRootOfTree.left);
+		if(head == null) {
+			head = pRootOfTree;
+			realHead = pRootOfTree;
+		}else {
+			head.right = pRootOfTree;
+			pRootOfTree.left = head;
+			head = pRootOfTree;
+		}
+		ConvertSub(pRootOfTree.right);
+	}
+}
+```
+
+## 合并两个排序的链表
+### 题目描述
+输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。
+### 分析
+
+### 贴出代码
+```java
+/*
+public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}*/
+public class Solution {
+    public ListNode Merge(ListNode list1,ListNode list2) {
+        if(list1 == null) {
+        	return list2;
+        }else if(list2 == null) {
+        	return list1;
+        }
+        if(list1.val <= list2.val) {
+        	list1.next = Merge(list1.next, list2);
+        	return list1;
+        }else {
+        	list2.next = Merge(list1, list2.next);
+        	return list2;
+        }
+    }
+}
+```
+
+## 数组中出现次数超过一半的数字
+### 题目描述
+数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。例如输入一个长度为9的数组{1,2,3,2,2,2,5,4,2}。由于数字2在数组中出现了5次，超过数组长度的一半，因此输出2。如果不存在则输出0。
+### 分析
+
+### 贴出代码
+```java
+import java.util.Arrays;
+public class Solution {
+    public int MoreThanHalfNum_Solution(int [] array) {
+        Arrays.sort(array);
+        int count = 0;
+        for(int i = 0; i < array.length; i++) {
+        	if(array[i] == array[array.length / 2]) {
+        		count++;
+        	}
+        }
+        if(count > array.length / 2) {
+        	return array[array.length / 2];
+        }else {
+        	return 0;
+        }
+    }
+}
+```
+
+## 把数组排成最小的数
+### 题目描述
+输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
+### 分析
+
+### 贴出代码
+```java
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Collections;
+public class Solution {
+    public String PrintMinNumber(int [] numbers) {
+        int n;
+		String s = "";
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		n = numbers.length;
+		for(int i = 0; i < n; i++) {
+			list.add(numbers[i]);
+		}
+		Collections.sort(list, new Comparator<Integer>() {
+			public int compare(Integer str1, Integer str2) {
+				String s1 = str1 + "" + str2;
+				String s2 = str2 + "" + str1;
+				return s1.compareTo(s2);
+			}
+		});
+		for(int j : list) {
+			s += j;
+		}
+		return s;
+    }
+}
+```
+## 
