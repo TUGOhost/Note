@@ -1304,7 +1304,7 @@ public class Solution {
 ### 题目描述
 输入两个单调递增的链表，输出两个链表合成后的链表，当然我们需要合成后的链表满足单调不减规则。
 ### 分析
-
+因为是递增的两个链表，为空则抛出另一个数组，如果不为空，谁小谁在前面，next指向下一个节点。
 ### 贴出代码
 ```java
 /*
@@ -1338,7 +1338,7 @@ public class Solution {
 ### 题目描述
 数组中有一个数字出现的次数超过数组长度的一半，请找出这个数字。例如输入一个长度为9的数组{1,2,3,2,2,2,5,4,2}。由于数字2在数组中出现了5次，超过数组长度的一半，因此输出2。如果不存在则输出0。
 ### 分析
-
+先将数组进行排序，那么数组中肯定会有一个数超过了数组的一般，如果相等则+1，然后判断count是否大于数组长度的一半。
 ### 贴出代码
 ```java
 import java.util.Arrays;
@@ -1393,4 +1393,185 @@ public class Solution {
     }
 }
 ```
-## 
+## 从上往下打印二叉树
+### 题目描述
+从上往下打印出二叉树的每个节点，同层节点从左至右打印。
+### 分析
+用arraylist模拟一个队列来存储相应的TreeNode
+### 贴出代码
+```java
+import java.util.ArrayList;
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+public class Solution {
+    public ArrayList<Integer> PrintFromTopToBottom(TreeNode root) {
+        ArrayList<Integer> list = new ArrayList<>();
+		ArrayList<TreeNode> queue = new ArrayList<>();
+		if(root == null) {
+			return list;
+		}
+		queue.add(root);
+		while(queue.size() != 0) {
+			TreeNode temp = queue.remove(0);
+			if(temp.left != null) {
+				queue.add(temp.left);
+			}
+			if(temp.right != null) {
+				queue.add(temp.right);
+			}
+			list.add(temp.val);
+		}
+		return list;
+    }
+}
+```
+
+## 表示数值的字符串
+### 题目描述
+请实现一个函数用来判断字符串是否表示数值（包括整数和小数）。例如，字符串"+100","5e2","-123","3.1416"和"-1E-16"都表示数值。 但是"12e","1a3.14","1.2.3","+-5"和"12e+4.3"都不是。
+### 分析
+以下对正则进行解释:
+	[\\+\\-]?            -> 正或负符号出现与否
+	\\d*                 -> 整数部分是否出现，如-.34 或 +3.34均符合
+	(\\.\\d+)?           -> 如果出现小数点，那么小数点后面必须有数字；否则一起不出现
+	([eE][\\+\\-]?\\d+)? -> 如果存在指数部分，那么e或E肯定出现，+或-可以不出现，紧接着必须跟着整数；或者整个部分都不出现
+### 贴出代码
+```java
+public class Solution {
+    public boolean isNumeric(char[] str) {
+        String string = String.valueOf(str);
+        return string.matches("[\\+\\-]?\\d*(\\.\\d+)?([eE][\\+\\-]?\\d+)?");
+    }
+}
+```
+
+## 和为S的连续正数序列
+### 题目描述
+小明很喜欢数学,有一天他在做数学作业时,要求计算出9~16的和,他马上就写出了正确答案是100。但是他并不满足于此,他在想究竟有多少种连续的正数序列的和为100(至少包括两个数)。没多久,他就得到另一组连续正数和为100的序列:18,19,20,21,22。现在把问题交给你,你能不能也很快的找出所有和为S的连续正数序列? Good Luck!
+**输出描述:**
+> 输出所有和为S的连续正数序列。序列内按照从小至大的顺序，序列间按照开始数字从小到大的顺序
+
+### 分析
+双指针技术，就是相当于有一个窗口，窗口的左右两边就是两个指针，我们根据窗口内值之和来确定窗口的位置和宽度。非常牛逼的思路，虽然双指针或者所谓的滑动窗口技巧还是蛮常见的，但是这一题还真想不到这个思路。
+### 贴出代码
+```java
+import java.util.ArrayList;
+public class Solution {
+    public ArrayList<ArrayList<Integer> > FindContinuousSequence(int sum) {
+       ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+	       int plow = 1, phigh = 2;
+	       while (phigh > plow) {
+	    	   int cur = (phigh + plow) * (phigh - plow + 1) / 2;
+	    	   if(cur == sum) {
+	    		   ArrayList<Integer> list = new ArrayList<>();
+	    		   for(int i = plow; i <= phigh; i++) {
+	    			   list.add(i);
+	    		   }
+	    		   result.add(list);
+	    		   plow++;
+	    	   }else if(cur < sum) {
+	    		   phigh ++;
+	    	   }else {
+	    		   plow++;
+	    	   }
+	       }
+	       return result;
+    }
+}
+```
+
+## 把字符串转换成整数
+### 题目描述
+将一个字符串转换成一个整数(实现Integer.valueOf(string)的功能，但是string不符合数字要求时返回0)，要求不能使用字符串转换整数的库函数。 数值为0或者字符串不是一个合法的数值则返回0。
+**输入描述:**
+> 输入一个字符串,包括数字字母符号,可以为空
+
+**输出描述:**
+> 如果是合法的数值表达则返回该数字，否则返回0
+
+**示例1**
+> 输入
+> +2147483647
+>    1a33
+
+> 输出
+> 2147483647
+>    0
+### 分析
+
+### 贴出代码
+```java
+public class Solution {
+    public int StrToInt(String str) {
+        if(str.equals("") || str.length() == 0) {
+			return 0;
+		}
+		char[] a = str.toCharArray();
+		int fuhao = 0;
+		if (a[0] == '-') {
+			fuhao = 1;
+		}
+		int sum = 0;
+		for(int i = fuhao; i < a.length; i++) {
+			if(a[i] == '+') {
+				continue;
+			}
+			if(a[i] < 48 || a[i] > 57) {
+				return 0;
+			}
+			sum = sum * 10 + a[i] -48;
+		}
+		return fuhao == 0 ? sum : sum * -1;
+    }
+}
+```
+
+## 二叉树中和为某一值的路径
+### 题目描述
+输入一颗二叉树的跟节点和一个整数，打印出二叉树中结点值的和为输入整数的所有路径。路径定义为从树的根结点开始往下一直到叶结点所经过的结点形成一条路径。(注意: 在返回值的list中，数组长度大的数组靠前)
+### 分析
+递归遍历即可。
+### 贴出代码
+```java
+import java.util.ArrayList;
+/**
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+    }
+}
+*/
+public class Solution {
+    private ArrayList<ArrayList<Integer>> listAll = new ArrayList<ArrayList<Integer>>();
+	private ArrayList<Integer> list = new ArrayList<Integer>();
+	public ArrayList<ArrayList<Integer>> FindPath(TreeNode root,int target) {
+        if(root == null) {
+        	return listAll;
+        }
+        list.add(root.val);
+        target -= root.val;
+        if(target == 0 && root.left == null && root.right == null) {
+        	listAll.add(new ArrayList<Integer>(list));
+        }
+        FindPath(root.left, target);
+        FindPath(root.right, target);
+        list.remove(list.size() - 1);
+        return listAll;
+    }
+}
+```

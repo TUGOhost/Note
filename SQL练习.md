@@ -353,3 +353,106 @@ DELETE p1 FROM Person p1,
 WHERE
     p1.Email = p2.Email AND p1.Id > p2.Id
 ```
+## 197. 上升的温度
+### 题目描述
+给定一个 Weather 表，编写一个 SQL 查询，来查找与之前（昨天的）日期相比温度更高的所有日期的 Id。
+```
++---------+------------------+------------------+
+| Id(INT) | RecordDate(DATE) | Temperature(INT) |
++---------+------------------+------------------+
+|       1 |       2015-01-01 |               10 |
+|       2 |       2015-01-02 |               25 |
+|       3 |       2015-01-03 |               20 |
+|       4 |       2015-01-04 |               30 |
++---------+------------------+------------------+
+```
+例如，根据上述给定的 Weather 表格，返回如下 Id:
+```
++----+
+| Id |
++----+
+|  2 |
+|  4 |
++----+
+```
+### 分析
+### 贴出代码
+```sql
+select b.Id
+from Weather a
+left join
+Weather b
+on
+date_add(a.RecordDate,interval 1 day) = b.RecordDate
+where
+a.Temperature < b.Temperature;
+```
+## 176. 第二高的薪水
+### 题目描述
+编写一个 SQL 查询，获取 Employee 表中第二高的薪水（Salary） 。
+```
++----+--------+
+| Id | Salary |
++----+--------+
+| 1  | 100    |
+| 2  | 200    |
+| 3  | 300    |
++----+--------+
+```
+例如上述 Employee 表，SQL查询应该返回 200 作为第二高的薪水。如果不存在第二高的薪水，那么查询应返回 null。
+```
++---------------------+
+| SecondHighestSalary |
++---------------------+
+| 200                 |
++---------------------+
+```
+### 分析
+select distinct salary from Employee order by salary desc limit 1,1 就可以，但是输不出null，所以外面再加一层 select (select distinct salary from Employee order by salary desc limit 1,1) as SecondHighestSalary ;
+当Employee表里只有一条数据时，内层SQL语句查询不到数据，其返回结果是空，而外层SQL的作用是把内层的查询结果赋值给SecondHighestSalary.
+### 贴出代码
+```sql
+select 
+(select distinct salary 
+from Employee 
+ order by salary 
+ desc limit 1,1) 
+ as SecondHighestSalary ;
+```
+
+## 626. 换座位
+### 题目描述
+小美是一所中学的信息科技老师，她有一张 seat 座位表，平时用来储存学生名字和与他们相对应的座位 id。
+其中纵列的 id 是连续递增的
+小美想改变相邻俩学生的座位。
+你能不能帮她写一个 SQL query 来输出小美想要的结果呢？
+**示例：**
+```
++---------+---------+
+|    id   | student |
++---------+---------+
+|    1    | Abbot   |
+|    2    | Doris   |
+|    3    | Emerson |
+|    4    | Green   |
+|    5    | Jeames  |
++---------+---------+
+```
+假如数据输入的是上表，则输出结果如下：
+```
++---------+---------+
+|    id   | student |
++---------+---------+
+|    1    | Doris   |
+|    2    | Abbot   |
+|    3    | Green   |
+|    4    | Emerson |
+|    5    | Jeames  |
++---------+---------+
+```
+**注意：**
+如果学生人数是奇数，则不需要改变最后一个同学的座位。
+### 贴出代码
+```sql
+
+```
