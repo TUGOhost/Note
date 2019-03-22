@@ -31,9 +31,17 @@ location /group1/M00 {
 重启storage
 > docker restart storage
 
+还是有一点问题
+
 # 整合elasticsearch
 拉取docker镜像
 > docker pull docker.elastic.co/elasticsearch/elasticsearch:6.6.2
 
 Run
 > docker run -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.6.2
+
+# 整合RabbitMQ
+拉取docker镜像
+> docker pull rabbitmq:3.6.15-management
+运行
+> docker run -d --hostname localhost --name myrabbit -p 15672:15672 -p 5672:5672 rabbitmq:3.6.15-management
