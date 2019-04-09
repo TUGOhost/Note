@@ -42,7 +42,7 @@
   - GitHub地址: https://github.com/TUGOhost/leyou
   - 开发时间: 2019.01 - 2019.03
   - 开发环境: `IDEA` `Windows 10`
-  - 项目描述: 该项目相当于宿舍小卖铺的升级版，使用`Spring Cloud`作为微服务框架，`Spring Boot`作为项目的子服务，使用了`Netflix Zuul`作为网关处理，`Netflix Eureka`作为注册中心用于注册服务和订阅服务，`Ribbon`作为负载均衡，Hstix作为失败容错，利用`RabbitMQ`作为消息队列进行发送消息、接收消息；使用`MySQL`作为数据层的主数据库，使用Redis作为数据层的缓存使用，利用`elasticsearch`作为数据检索引擎。
+  - 项目描述: 该项目相当于宿舍小卖铺的升级版，使用`Spring Cloud`作为微服务框架，`Spring Boot`作为项目的子服务，使用了`Netflix Zuul`作为网关处理，`Netflix Eureka`作为注册中心用于注册服务和订阅服务，`Ribbon`作为负载均衡，`Hstix`作为失败容错，利用`RabbitMQ`作为消息队列进行发送消息、接收消息；使用`MySQL`作为数据层的主数据库，使用`Redis`作为数据层的缓存使用，利用`elasticsearch`作为数据检索引擎，使用`FastDFS`作为图片文件存储系统。
 
   - 1.参与需求分析评审工作
   - 2.统计分析模块开发及单元测试，集成测试
@@ -50,7 +50,7 @@
   - GitHub地址: https://github.com/TUGOhost/LonelyPlanet
   - 开发时间: 2019.04 - 至今
   - 开发环境: `IDEA` `Windows 10`
-  - 项目描述: 使用`Netty`和`Spring Boot`开发的一款IM软件，寻找使用这个软件的另一个孤独星球。已有添加好友，通过二维码添加好友等功能。
+  - 项目描述: 使用`Netty`和`Spring Boot`开发的一款IM软件，使用FastDFS作为图片文件存储系统，寻找使用这个软件的另一个孤独星球。已有添加好友，通过二维码添加好友等功能。
   - 1.参与需求分析评审工作
   - 2.统计分析模块开发及单元测试，集成测试
   - 3.参与该项目上线工作

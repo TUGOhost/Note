@@ -8,6 +8,12 @@ docker安装fastdfs镜像
 运行storage,注意把xxx.xxx.xxx.xxx换成自己的EOS服务器IP
 > docker run -d --name storage --net=host -e TRACKER_IP=xxx.xxx.xxx.xxx:22122 -e GROUP_NAME= morunchang/fastdfs sh storage.sh
 
+docker run -d --restart=always --privileged=true --net=host --name=fastdfs -e IP=47.100.191.203 -v ${HOME}/fastdfs:/var/local/fdfs qbanxiaoli/fastdfs
+
+
+docker run -d --restart=always --privileged=true --net=host --name=fastdfs -e IP=47.100.191.203 -e WEB_PORT=88 -v ${HOME}/fastdfs:/var/local/fdfs qbanxiaoli/fastdfs
+
+
 进入storage容器内部
 > docker exec -it storage  /bin/bash
 
@@ -25,6 +31,8 @@ location /group1/M00 {
      expires 30d;
  }
 ```
+docker run -dti --network=host --name storage -e TRACKER_SERVER=47.100.191.203:22122 -v /var/fdfs/storage:/var/fdfs delron/fastdfs storage
+
 退出
 > exit
 
