@@ -19,7 +19,7 @@
 - 深入了解过`Spring`技术栈，掌握`IOC`/`DI`/`AOP`核心原理。
 - 熟练掌握`MySQL`，深入了解过`InnoDB`存储引擎，研读过相关书籍，数据库设计规范，能够对常见的`SQL`语句进行优化。
 - 熟练使用NoSQL数据库`Redis`，了解Redis的集群，读写分离，持久化，数据类型以及应用场景。
-- 熟悉项目构建工具`MAVEN`，熟悉项目管理工具`Git`，Svn，熟悉Linux的常用操作。
+- 熟悉项目构建工具`MAVEN`，熟悉项目管理工具`Git`，Svn，熟悉`Linux`的常用操作。
 ---
 # 实习经历
  - #### 实习地点: 宿州市国税局
@@ -28,18 +28,18 @@
 ---
 # 开源项目
  - ##### 宿舍小卖铺:
-   - GitHub地址: https://github.com/TUGOhost/DormitorySho
+   - [GitHub地址](https://github.com/TUGOhost/DormitorySho)
    - 开发时间: 2018.08 - 2018.10
    - 开发环境: `IDEA` `Windows 10`
 
-   - 项目描述: 该项目缘由室友在宿舍开了个小卖铺，因为平时上课原因不能经常拿手机，所以开发这个，作为一个O2O平台，同学需要购买零食或者其他工具，都可以通过这个平台来预约，并通知管理员。该项目使用`Spring`和`SpringMVC`做Web后端框架，使用`Mybatis`作为SQL映射，使用`C3P0`做为后端连接池访问数据层，使用`MySQL`作为项目的数据层。
+   - 项目描述: 该项目缘由室友在宿舍开了个小卖铺，因为平时上课原因不能经常拿手机，所以开发这个，作为一个O2O平台，同学需要购买零食或者其他工具，都可以通过这个平台来预约，并通知管理员。该项目使用`Spring`和`SpringMVC`做Web后端框架，使用`Mybatis`作为SQL映射，使用`C3P0`做为后端连接池访问数据层，使用`MySQL`作为项目的数据层，使用`Redis`作为数据缓存层。
 
    - 1.参与系统设计、数据库设计、核心功能模块开发、性能优化、浏览器兼容性处理等工作
    - 2.解决开发过程中的技术问题
    - 3.参与该项目上线工作
 
 - ##### 乐优商城:
-  - GitHub地址: https://github.com/TUGOhost/leyou
+  - [GitHub地址](https://github.com/TUGOhost/leyou)
   - 开发时间: 2019.01 - 2019.03
   - 开发环境: `IDEA` `Windows 10`
   - 项目描述: 该项目相当于宿舍小卖铺的升级版，使用`Spring Cloud`作为微服务框架，`Spring Boot`作为项目的子服务，使用了`Netflix Zuul`作为网关处理，`Netflix Eureka`作为注册中心用于注册服务和订阅服务，`Ribbon`作为负载均衡，`Hstix`作为失败容错，利用`RabbitMQ`作为消息队列进行发送消息、接收消息；使用`MySQL`作为数据层的主数据库，使用`Redis`作为数据层的缓存使用，利用`elasticsearch`作为数据检索引擎，使用`FastDFS`作为图片文件存储系统。
@@ -47,10 +47,10 @@
   - 1.参与需求分析评审工作
   - 2.统计分析模块开发及单元测试，集成测试
 - ##### 孤独星球:
-  - GitHub地址: https://github.com/TUGOhost/LonelyPlanet
+  - [GitHub地址](https://github.com/TUGOhost/LonelyPlanet)
   - 开发时间: 2019.04 - 至今
   - 开发环境: `IDEA` `Windows 10`
-  - 项目描述: 使用`Netty`和`Spring Boot`开发的一款IM软件，使用FastDFS作为图片文件存储系统，寻找使用这个软件的另一个孤独星球。已有添加好友，通过二维码添加好友等功能。
+  - 项目描述: 使用`Netty`和`Spring Boot`开发的一款IM软件，使用`FastDFS`作为图片文件存储系统，寻找使用这个软件的另一个孤独星球。已有添加好友，通过二维码添加好友等功能。
   - 1.参与需求分析评审工作
   - 2.统计分析模块开发及单元测试，集成测试
   - 3.参与该项目上线工作
