@@ -1575,3 +1575,192 @@ public class Solution {
     }
 }
 ```
+## 第一个只出现一次的字符
+### 题目描述
+在一个字符串(0<=字符串长度<=10000，全部由字母组成)中找到第一个只出现一次的字符,并返回它的位置, 如果没有则返回 -1（需要区分大小写）.
+### 分析
+
+### 贴出代码
+```java
+import java.util.HashMap;
+public class Solution {
+    public int FirstNotRepeatingChar(String str) {
+        if (str == null){
+	        return -1;
+        }
+        HashMap<Character, Integer> map = new HashMap<>();
+        for (int i = 0; i < str.length(); i++){
+            if (map.containsKey(str.charAt(i))){
+                int time = map.get(str.charAt(i));
+                map.put(str.charAt(i),++time);
+            }
+            else{
+                map.put(str.charAt(i),1);
+            }
+        }
+        int i = 0;
+        for (; i <str.length(); i++){
+            if (map.get(str.charAt(i)) == 1){
+                return i;
+            }
+        }
+        return -1;
+    }
+}
+```
+
+## 数据流中的中位数
+### 题目描述
+如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。我们使用Insert()方法读取数据流，使用GetMedian()方法获取当前读取数据的中位数。
+### 分析
+
+### 贴出代码
+```java
+import java.util.Comparator;
+import java.util.PriorityQueue;
+public class Solution {
+
+    private int count = 0;
+    // 小根堆
+    private PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+    // 大根堆
+    private PriorityQueue<Integer> maxHeap = new PriorityQueue<Integer>(15, new Comparator<Integer>() {
+        @Override
+        public int compare(Integer o1, Integer o2) {
+            return o2 - o1;
+        }
+    });
+
+    public void Insert(Integer num) {
+
+        if (count  % 2 == 0){
+            maxHeap.offer(num);
+            int filteredMaxNum = maxHeap.poll();
+            minHeap.offer(filteredMaxNum);
+        }else{
+            minHeap.offer(num);
+            int filteredMinNum = minHeap.poll();
+            maxHeap.offer(filteredMinNum);
+        }
+        count++;
+    }
+
+    public Double GetMedian() {
+        if (count  % 2 == 0) {
+            return new Double((minHeap.peek() + maxHeap.peek())) / 2;
+        }else {
+            return new Double(minHeap.peek());
+        }
+    }
+
+
+}
+```
+
+## 调整数组顺序使奇数位于偶数前面
+### 题目描述
+输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，所有的偶数位于数组的后半部分，并保证奇数和奇数，偶数和偶数之间的相对位置不变。
+### 分析
+
+### 贴出代码
+```java
+public class Solution {
+    public void reOrderArray(int [] array) {
+        if (array == null || array.length == 0){
+            return;
+        }
+        int i = 0,j;
+        while(i < array.length){
+            while (i < array.length && !isEven(array[i])){
+                i++;
+            }
+            j = i+1;
+            while (j < array.length && isEven(array[j])){
+                j++;
+            }
+            if (j < array.length){
+                int tmp = array[j];
+                for (int j2 = j -1 ; j2 >= i ; j2--){
+                    array[j2+1] = array[j2];
+                }
+                array[i++] = tmp;
+            }else {
+                break;
+            }
+        }
+    }
+
+    private boolean isEven(int n){
+        if (n % 2 == 0){
+            return true;
+        }
+        return false;
+    }
+}
+```
+
+## 扑克牌顺子
+### 题目描述
+LL今天心情特别好,因为他去买了一副扑克牌,发现里面居然有2个大王,2个小王(一副牌原本是54张^_^)...他随机从中抽出了5张牌,想测测自己的手气,看看能不能抽到顺子,如果抽到的话,他决定去买体育彩票,嘿嘿！！“红心A,黑桃3,小王,大王,方片5”,“Oh My God!”不是顺子.....LL不高兴了,他想了想,决定大\小 王可以看成任何数字,并且A看作1,J为11,Q为12,K为13。上面的5张牌就可以变成“1,2,3,4,5”(大小王分别看作2和4),“So Lucky!”。LL决定去买体育彩票啦。 现在,要求你使用这幅牌模拟上面的过程,然后告诉我们LL的运气如何， 如果牌能组成顺子就输出true，否则就输出false。为了方便起见,你可以认为大小王是0。
+### 分析
+
+### 贴出代码
+```java
+public class Solution {
+    public boolean isContinuous(int [] numbers) {
+       int[] d = new int[14];
+       d[0] = -5;
+       int len = numbers.length;
+       int max = -1;
+       int min = 14;
+       for (int i = 0 ; i < len; i++){
+           d[numbers[i]] ++;
+           // 是0就继续
+           if (numbers[i] == 0){
+               continue;
+           }
+           if (d[numbers[i]] > 1){
+               // 出现了两次
+               return false;
+           }
+           if (numbers[i] > max){
+               // 值比最大值还大
+               max = numbers[i];
+           }
+           if (numbers[i] < min){
+               // 值比最小值还小
+               min = numbers[i];
+           }
+       }
+       if (max - min < 5){
+           return true;
+
+       }
+       return false;
+    }
+}
+```
+
+## 替换空格
+### 题目描述
+请实现一个函数，将一个字符串中的每个空格替换成“%20”。例如，当字符串为We Are Happy.则经过替换之后的字符串为We%20Are%20Happy。
+### 分析
+
+### 贴出代码
+```java
+public class Solution {
+    public String replaceSpace(StringBuffer str) {
+    	String sti = str.toString();
+        char[] chars = sti.toCharArray();
+        StringBuffer out = new StringBuffer();
+        for (int i = 0 ; i < chars.length; i++){
+            if (chars[i] == ' '){
+                out.append("%20");
+            }else {
+                out.append(chars[i]);
+            }
+        }
+        return out.toString();
+    }
+}
+```
