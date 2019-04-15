@@ -2,7 +2,7 @@
 
 **详细理解Java反射机制**
 
-[思维导图](https://www.processon.com/view/link/5b9b4077e4b06fc64af44102)
+![](../image/Java反射机制.png)
 
 ## 反射是什么
 
@@ -434,13 +434,13 @@ Process finished with exit code 0
 
 ```
 
-![](image/125.png)
+![](../image/125.png)
 
 `不积跬步无以至千里`
 
 ## 思维导图
 
-![](image/17.jpg)
+![](../image/17.jpg)
 
 扩展阅读：
 
@@ -887,7 +887,7 @@ public void validateValues() throws @Critical ValidationFailedException{
 
 ## 思维导图
 
-![](image/18.jpg)
+![](../image/18.jpg)
 
 ## 扩展阅读
 

@@ -1764,3 +1764,88 @@ public class Solution {
     }
 }
 ```
+
+## 从尾到头打印链表
+### 题目描述
+输入一个链表，按链表值从尾到头的顺序返回一个ArrayList。
+### 分析
+递归即可。
+### 贴出代码
+```java
+/**
+*    public class ListNode {
+*        int val;
+*        ListNode next = null;
+*
+*        ListNode(int val) {
+*            this.val = val;
+*        }
+*    }
+*
+*/
+import java.util.ArrayList;
+public class Solution {
+    ArrayList<Integer> arrayList = new ArrayList<Integer>();
+    public ArrayList<Integer> printListFromTailToHead(ListNode listNode) {
+        if (listNode != null){
+            this.printListFromTailToHead(listNode.next);
+            arrayList.add(listNode.val);
+        }
+        return arrayList;
+    }
+}
+```
+
+## 二叉搜索树的第k个结点
+### 题目描述
+给定一棵二叉搜索树，请找出其中的第k小的结点。例如，（5，3，7，2，4，6，8）中，按结点数值大小顺序第三小结点的值为4。
+### 分析
+
+### 贴出代码
+```java
+/*
+public class TreeNode {
+    int val = 0;
+    TreeNode left = null;
+    TreeNode right = null;
+
+    public TreeNode(int val) {
+        this.val = val;
+
+    }
+
+}
+*/
+public class Solution {
+    int index = 0;
+    TreeNode KthNode(TreeNode pRoot, int k)
+    {
+        if(pRoot != null){
+            TreeNode node = KthNode(pRoot.left,k);
+            if(node != null){
+                return node;
+            }
+            index++;
+            if(index == k){
+                return pRoot;
+            }
+            node = KthNode(pRoot.right,k);
+            if(node != null){
+                return node;
+            }
+            
+        }
+        return null;
+    }
+
+}
+```
+## 滑动窗口的最大值
+### 题目描述
+给定一个数组和滑动窗口的大小，找出所有滑动窗口里数值的最大值。例如，如果输入数组{2,3,4,2,6,2,5,1}及滑动窗口的大小3，那么一共存在6个滑动窗口，他们的最大值分别为{4,4,6,6,6,5}； 针对数组{2,3,4,2,6,2,5,1}的滑动窗口有以下6个： {[2,3,4],2,6,2,5,1}， {2,[3,4,2],6,2,5,1}， {2,3,[4,2,6],2,5,1}， {2,3,4,[2,6,2],5,1}， {2,3,4,2,[6,2,5],1}， {2,3,4,2,6,[2,5,1]}。
+### 分析
+
+### 贴出代码
+```java
+
+```
