@@ -1847,5 +1847,59 @@ public class Solution {
 
 ### 贴出代码
 ```java
+import java.util.*;
 
+public class Solution {
+    public ArrayList<Integer> maxInWindows(int [] num, int size)
+    {
+        // 定义要返回的数组
+        ArrayList<Integer> res = new ArrayList<>();
+        // 如果size=0或者size > num的长度，则返回空的res
+        if (size == 0 || size > num.length){
+            return res;
+        }
+
+        for (int i = 0 ; i <= num.length - size ; i ++){
+            // 自定义最大值为num[i]
+            int max = num[i];
+            // 滑动窗口，如果num[j] > max ，则交换max和num[j]
+            for (int j = i + 1; j < i + size; j ++){
+                if (num[j] > max){
+                    max = num[j];
+                }
+            }
+            // res添加max
+            res.add(max);
+        }
+
+        return res;
+    }
+}
+```
+
+## 二维数组中的查找
+### 题目描述
+在一个二维数组中（每个一维数组的长度相同），每一行都按照从左到右递增的顺序排序，每一列都按照从上到下递增的顺序排序。请完成一个函数，输入这样的一个二维数组和一个整数，判断数组中是否含有该整数。
+### 分析
+由题意可知，一行是递增的，所以一行一行的查找，采用二分查找思想。
+### 贴出代码
+```java
+public class Solution {
+    public boolean Find(int target, int [][] array) {
+        for (int i = 0; i < array.length; i ++){
+            int min = 0;
+            int max = array[i].length - 1;
+            while (min <= max){
+                int mid = (min + max) / 2;
+                if (target > array[i][mid]){
+                    min = mid + 1;
+                }else if (target < array[i][mid]){
+                    max = mid - 1;
+                }else
+                    return true;
+            }
+        }
+        return false;
+    }
+}
 ```
