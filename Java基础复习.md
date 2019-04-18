@@ -71,10 +71,31 @@ private static class IntegerCache {
     }
 ```
 ##  String
-
 ### 概览
+String被声明为final，因此它不可被继承。
+```java
+public final class String
+    implements java.io.Serializable, Comparable<String>, CharSequence {
+    /** The value is used for character storage. */
+    private final char value[];
+```
+内部使用char数组存储数据，该数组被声明为final，这意味着value数组初始化之后就不能再引用其他数组。并且String内部没有改变value数组的方法，因此可以保证String不可变。
 ### 不可变的好处
+1. 可以缓存hash值
+2. String Pool的需要
+如果一个String对象已经被创建过了，那么就会从String Pool中取得引用。只有String是不可变的，才可能使用String Pool。
+3. 安全性
+String经常作为参数，String不可变性可以保证参数不可变。
+4. 线程安全
+String不可变性天生具备线程安全，可以在多个线程中安全地使用。
 ### String，StringBuffer and StringBuilder
+1. 可变性
+- String不可变
+- StringBuffer和StringBuilder可变
+2. 线程安全
+- String不可变，因此是线程安全的
+- StringBuilder不是线程安全的
+- StringBuffer是线程安全的，内部使用synchronized进行同步
 ### String.intern()
 ## 运算
 ### 参数传递
