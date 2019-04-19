@@ -2104,3 +2104,44 @@ public class Solution {
     }
 }
 ```
+## 机器人的运动范围
+### 题目描述
+地上有一个m行和n列的方格。一个机器人从坐标0,0的格子开始移动，每一次只能向左，右，上，下四个方向移动一格，但是不能进入行坐标和列坐标的数位之和大于k的格子。 例如，当k为18时，机器人能够进入方格（35,37），因为3+5+3+7 = 18。但是，它不能进入方格（35,38），因为3+5+3+8 = 19。请问该机器人能够达到多少个格子？
+### 分析
+回溯
+### 贴出代码
+```java
+public class Solution {
+    public int movingCount(int threshold, int rows, int cols) {
+        int flag[][] = new int[rows][cols];
+        return helper(0, 0 , threshold, rows, cols, flag);
+    }
+
+    private int helper(int i, int j, int threshold, int rows, int cols, int[][] flag){
+        if (i < 0 || i >= rows || j < 0 || j >= cols || numSum(i) + numSum(j) > threshold || flag[i][j] == 1) return 0;
+        flag[i][j] = 1;
+        return helper(i - 1, j, threshold, rows, cols, flag)
+                + helper(i + 1, j, threshold, rows, cols, flag)
+                + helper(i, j + 1, threshold, rows, cols, flag)
+                + helper(i, j + 1, threshold, rows, cols, flag)
+                + 1;
+    }
+
+    private int numSum(int i){
+        int sum = 0;
+        do{
+            sum += i % 10;
+        }while ((i = i /10) > 0);
+        return sum;
+    }
+}
+```
+## 矩阵中的路径
+### 题目描述
+请设计一个函数，用来判断在一个矩阵中是否存在一条包含某字符串所有字符的路径。路径可以从矩阵中的任意一个格子开始，每一步可以在矩阵中向左，向右，向上，向下移动一个格子。如果一条路径经过了矩阵中的某一个格子，则之后不能再次进入这个格子。 例如 a b c e s f c s a d e e 这样的3 X 4 矩阵中包含一条字符串"bcced"的路径，但是矩阵中不包含"abcb"路径，因为字符串的第一个字符b占据了矩阵中的第一行第二个格子之后，路径不能再次进入该格子。
+### 分析
+
+### 贴出代码
+```java
+
+```
