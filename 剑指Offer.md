@@ -2340,6 +2340,77 @@ public class Solution {
 ### 题目描述
 输入一个复杂链表（每个节点中有节点值，以及两个指针，一个指向下一个节点，另一个特殊指针指向任意一个节点），返回结果为复制后复杂链表的head。（注意，输出结果中请不要返回参数中的节点引用，否则判题程序会直接返回空）
 ### 分析
+评论区得来的答案
+1. 在旧链表中创建新链表，此时不处理新链表的兄弟节点
+2. 根据旧链表的兄弟节点，初始化新链表的兄弟节点
+3. 从旧链表中拆分得来新链表
+### 贴出代码
+```java
+/*
+public class RandomListNode {
+    int label;
+    RandomListNode next = null;
+    RandomListNode random = null;
+
+    RandomListNode(int label) {
+        this.label = label;
+    }
+}
+*/
+public class Solution {
+    public RandomListNode Clone(RandomListNode pHead)
+    {
+        if (pHead == null){
+            return null;
+        }
+        RandomListNode currentNode = pHead;
+
+        // 复制
+        while (currentNode != null){
+            RandomListNode cloneNode = new RandomListNode(currentNode.label);
+            RandomListNode nextNode = currentNode.next;
+            currentNode.next = cloneNode;
+            cloneNode.next =nextNode;
+            currentNode = nextNode;
+        }
+
+        currentNode = pHead;
+
+        // 复制老节点的随机指针给新节点
+        while (currentNode != null){
+            currentNode.next.random = currentNode.random == null ? null : currentNode.random.next;
+            currentNode = currentNode.next.next;
+        }
+
+        // 拆分链表，将链表拆分为原链表和复制后的链表
+        currentNode = pHead;
+        RandomListNode pCloneHead = pHead.next;
+        while (currentNode != null){
+            RandomListNode cloneNode = currentNode.next;
+            currentNode.next = cloneNode.next;
+            cloneNode.next = cloneNode.next == null ? null :cloneNode.next.next;
+            currentNode = currentNode.next;
+        }
+        return pCloneHead;
+    }
+}
+```
+## 字符串的排列
+### 题目描述
+输入一个字符串,按字典序打印出该字符串中字符的所有排列。例如输入字符串abc,则打印出由字符a,b,c所能排列出来的所有字符串abc,acb,bac,bca,cab和cba。
+**输入描述：**
+> 输入一个字符串,长度不超过9(可能有字符重复),字符只包括大小写字母。
+
+### 分析
+
+### 贴出代码
+```java
+
+```
+## 正则表达式匹配
+### 题目描述
+请实现一个函数用来匹配包括'.'和'*'的正则表达式。模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（包含0次）。 在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配
+### 分析
 
 ### 贴出代码
 ```java
