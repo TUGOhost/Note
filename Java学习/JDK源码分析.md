@@ -3452,3 +3452,21 @@ public static void main(String args[]){
 # 参考链接
 - https://docs.oracle.com/javase/8/docs/api/java/lang/String.html
 - https://www.hollischuang.com/archives/99
+
+# StringBuffer
+
+# StringBuilder
+
+# LinkedHashMap
+
+# CopyOnWriteArrayList
+
+# ConcurrentLinkedQueue
+
+# BlockingQueue
+
+# ConcurrentSkipListMap
+
+# AbstractQueueSynchronizer
+
+# Atomic类

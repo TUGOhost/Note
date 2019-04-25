@@ -2402,17 +2402,131 @@ public class Solution {
 > 输入一个字符串,长度不超过9(可能有字符重复),字符只包括大小写字母。
 
 ### 分析
-
+基于回溯的思想:
+![](image/334.png)
 ### 贴出代码
 ```java
+import java.util.*;
+public class Solution {
+    public ArrayList<String> Permutation(String str) {
+        List<String> res = new ArrayList<>();
+        if (str != null && str.length() > 0){
+            PermutationHelp(str.toCharArray(), 0, res);
+            Collections.sort(res);
+        }
+        return (ArrayList)res;
+    }
 
+    public void PermutationHelp(char[] cs, int i, List<String> list){
+        if (i == cs.length - 1){
+            String val = String.valueOf(cs);
+            if (!list.contains(val)){
+                list.add(val);
+            }
+        }else {
+            for (int j = i; j < cs.length; j ++){
+                swap(cs, i, j);
+                PermutationHelp(cs, i + 1, list);
+                swap(cs, i, j);
+            }
+        }
+    }
+
+    public void swap(char[] cs, int i, int j){
+        char temp = cs[i];
+        cs[i] = cs[j];
+        cs[j] = temp;
+    }
+}
 ```
 ## 正则表达式匹配
 ### 题目描述
 请实现一个函数用来匹配包括'.'和'*'的正则表达式。模式中的字符'.'表示任意一个字符，而'*'表示它前面的字符可以出现任意次（包含0次）。 在本题中，匹配是指字符串的所有字符匹配整个模式。例如，字符串"aaa"与模式"a.a"和"ab*ac*a"匹配，但是与"aa.a"和"ab*a"均不匹配
 ### 分析
+**当模式中的第二个字符不是“*”时**：
+1. 如果字符串第一个字符和模式中的第一个字符相匹配，那么字符串和模式都后移一个字符，然后匹配剩余的。
+2. 如果 字符串第一个字符和模式中的第一个字符相不匹配，直接返回false。
+
+**而当模式中的第二个字符是“*”时**：
+如果字符串第一个字符跟模式第一个字符不匹配，则模式后移2个字符，继续匹配。如果字符串第一个字符跟模式第一个字符匹配，可以有3种匹配方式：
+1. 模式后移2字符，相当于x*被忽略；
+2. 字符串后移1字符，模式后移2字符；
+3. 字符串后移1字符，模式不变，即继续匹配字符下一位，因为*可以匹配多位；
 
 ### 贴出代码
 ```java
+public class Solution {
+    public boolean match(char[] str, char[] pattern)
+    {
+        if (str == null || pattern == null){
+            return false;
+        }
+        int strIndex = 0;
+        int patternIndex = 0;
+        return matchCore(str,strIndex,pattern,patternIndex);
+    }
 
+    public boolean matchCore(char[] str, int strIndex, char[] pattern,int patternIndex){
+        if (strIndex == str.length && patternIndex == pattern.length){
+            return true;
+        }
+        if (strIndex != str.length && patternIndex == pattern.length){
+            return false;
+        }
+        if (patternIndex + 1 < pattern.length && pattern[patternIndex + 1] == '*'){
+            if ((strIndex != str.length && pattern[patternIndex] == str[strIndex]) || (pattern[patternIndex] == '.' && strIndex != str.length)){
+                return matchCore(str, strIndex, pattern, patternIndex + 2)
+                        || matchCore(str, strIndex + 1, pattern, patternIndex + 2)
+                        || matchCore(str, strIndex + 1, pattern, patternIndex);
+            }else {
+                return matchCore(str, strIndex, pattern,patternIndex + 2);
+            }
+        }
+        if ((strIndex != str.length && pattern[patternIndex] == str[strIndex]) || (pattern[patternIndex] == '.' && strIndex != str.length)){
+            return matchCore(str, strIndex + 1, pattern, patternIndex + 1);
+        }
+        return false;
+    }
+}
+```
+
+## 删除链表中重复的结点
+### 题目描述
+在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
+### 分析
+
+### 贴出代码
+```java
+/*
+ public class ListNode {
+    int val;
+    ListNode next = null;
+
+    ListNode(int val) {
+        this.val = val;
+    }
+}
+*/
+public class Solution {
+    public ListNode deleteDuplication(ListNode pHead)
+    {
+        ListNode first = new ListNode(-1);
+        first.next = pHead;
+        ListNode p = pHead;
+        ListNode last = first;
+        while (p != null && p.next != null){
+            if (p.val == p.next.val){
+                int val = p.val;
+                while (p != null && p.val == val){
+                    p = p.next;
+                }
+                last.next = p;
+            }else {
+                last = p;
+                p = p.next;
+            }
+        }
+        return first.next;
+    }
+}
 ```
