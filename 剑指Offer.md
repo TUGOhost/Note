@@ -2530,3 +2530,161 @@ public class Solution {
     }
 }
 ```
+## 翻转单词顺序列
+### 题目描述
+牛客最近来了一个新员工Fish，每天早晨总是会拿着一本英文杂志，写些句子在本子上。同事Cat对Fish写的内容颇感兴趣，有一天他向Fish借来翻看，但却读不懂它的意思。例如，“student. a am I”。后来才意识到，这家伙原来把句子单词的顺序翻转了，正确的句子应该是“I am a student.”。Cat对一一的翻转这些单词顺序可不在行，你能帮助他么？
+### 分析
+先翻转整个句子，然后翻转整个单词。
+依据空格来确定单词的起始和终止位置。
+### 贴出代码
+```java
+public class Solution {
+    public String ReverseSentence(String str) {
+        char[] cs = str.toCharArray();
+        reverse(cs, 0, cs.length - 1);
+        int blank = -1;
+        for (int i = 0; i < cs.length; i++) {
+            if (cs[i] == ' ') {
+                int nextBlank = i;
+                reverse(cs, blank + 1, nextBlank - 1);
+                blank = nextBlank;
+            }
+        }
+        reverse(cs, blank + 1, cs.length - 1);
+        return new String(cs);
+    }
+    public void reverse(char[] chars, int low, int hight) {
+        while (low < hight){
+            char temp = chars[low];
+            chars[low] = chars[hight];
+            chars[hight] = temp;
+            low ++;
+            hight --;
+        }
+    }
+}
+```
+## 顺时针打印矩阵
+### 题目描述
+输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字，例如，如果输入如下4 X 4矩阵： 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 则依次打印出数字1,2,3,4,8,12,16,15,14,13,9,5,6,7,11,10.
+### 分析
+
+### 贴出代码
+```java
+import java.util.ArrayList;
+public class Solution {
+    // new一个数组，以便下面函数能够调用
+    ArrayList a = new ArrayList();
+    public ArrayList<Integer> printMatrix(int [][] matrix) {
+        int tR = 0;
+        int tC = 0;
+        int dR = matrix.length - 1;
+        int dC = matrix[0].length - 1;
+        // 左上边界最多到达右下边界，用于判断是否还是剥圈打印
+        while (tR <= dR && tC <= dC){
+            printEdge(matrix, tR++, tC++, dR--, dC--);
+        }
+        return a;
+    }
+    public void printEdge(int [][] m, int tR, int tC, int dR,int dC){
+        // 先判断是否只是一横行，如果是，打印该横行的列（通常用于内圈）
+        if (tR == dR){
+            for (int i = tC; i <= dC; i ++){
+                a.add(m[tR][i]);
+            }
+        } else if (tC == dC){ // 再判断是否只是一竖列，如果是，打印该横行的列（通常用于内圈）
+            for (int i = tR; i <= dR; i++){
+                a.add(m[i][tC]);
+            }
+        }else {
+            // 用两个变量存储，用于判断当前位置
+            int curC = tC; 
+            int curR = tR;
+            // 当前位置未到达当前行的最右列 --> 往右去
+            while (curC != dC) {
+                a.add(m[tR][curC]);
+                curC ++;
+            }while (curR != dR){ // 当前位置未到达当前列的最底行 --> 往下去
+                a.add(m[curR][dC]);
+                curR ++;
+            }
+            while (curC != tC){  // 当前位置未到达当前行的最左列 --> 往左去
+                a.add(m[dR][curC]);
+                curC --;
+            }
+            while (curR != tR){  // 当前位置未到达当前列的最顶行 --> 往上去
+                a.add(m[curR][tC]);
+                curR--;
+            }
+        }
+    }
+}
+```
+
+## 数组中的逆序对
+### 题目描述
+在数组中的两个数字，如果前面一个数字大于后面的数字，则这两个数字组成一个逆序对。输入一个数组,求出这个数组中的逆序对的总数P。并将P对1000000007取模的结果输出。 即输出P%1000000007
+**输入描述**
+> 题目保证输入的数组中没有的相同的数字
+> 数据范围：
+>	对于%50的数据,size<=10^4
+>	对于%75的数据,size<=10^5
+>	对于%100的数据,size<=2*10^5
+
+**示例**
+输入
+> 1,2,3,4,5,6,7,0
+
+输出
+> 7
+### 分析
+看似很简单的题目，但是要考虑时间复杂度不能太高，因为输入的数组可能非常大。
+### 贴出代码
+```java
+public class Solution {
+    int cnt;
+    public int InversePairs(int [] array) {
+        cnt = 0;
+        if (array != null || array.length != 0){
+            mergeSortUp2Down(array,0, array.length - 1);
+        }
+        return cnt;
+    }
+
+    // 归并排序从上往下
+    public void mergeSortUp2Down(int[] a, int start, int end){
+        if (start >= end) {
+            return;
+        }
+        int mid = (start + end) >> 1;
+        mergeSortUp2Down(a, start, mid);
+        mergeSortUp2Down(a, mid + 1, end);
+        merge(a, start, mid, end);
+    }
+
+    // 将一个数组中的两个相邻有序区间合并成一个
+    public void merge(int[] a, int start, int mid, int end){
+        int[] tmp = new int[end - start + 1];
+
+        int i = start, j = mid + 1, k = 0;
+        while (i <= mid &&j <= end){
+            if (a[i] < a[j]){
+                tmp[k ++] = a[i ++];
+            }else {
+                tmp[k ++] = a[j ++];
+                cnt += mid - i + 1;
+                cnt %= 1000000007;
+            }
+        }
+        while (i <= mid){
+            tmp[k ++] = a[i ++];
+        }
+        while (j <= end){
+            tmp[k ++] = a[j ++];
+        }
+        for (k = 0; k < tmp.length; k ++){
+            a[start + k] = tmp[k];
+        }
+    }
+}
+```
