@@ -3453,10 +3453,148 @@ public static void main(String args[]){
 - https://docs.oracle.com/javase/8/docs/api/java/lang/String.html
 - https://www.hollischuang.com/archives/99
 
-# StringBuffer
+# StringBuffer & StringBuilder
+## 简介
+`StringBuffer`与`StringBuilder`是两个常用的操作字符串的类。大家都知道，`StringBuilder`是线程不安全的，而`StringBuffer`是线程安全的。前者是JDK1.5加入的，后者在JDK1.0就有了。
 
-# StringBuilder
+## 继承关系
+```java
+public final class StringBuffer
+    extends AbstractStringBuilder
+    implements java.io.Serializable, CharSequence
 
+public final class StringBuilder
+    extends AbstractStringBuilder
+    implements java.io.Serializable, CharSequence    
+```
+可以看到，两个类的继承关系是一模一样的。`Serializable`是可以序列化的标志。`CharSequence`接口包含了`charAt()`、`length()`、`subSequence()`、`toString()`这几个方法，`String`类也实现了这个接口。这里的重点是抽象类`AbstractStringBuilder`，这个类封装了`StringBuilder`和`StringBuffer`大部分操作的实现。
+## AbstractStringBuilder
+### 变量及构造方法
+```java
+char[] value;
+int count;
+AbstractStringBuilder() {
+}
+AbstractStringBuilder(int capacity) {
+    value = new char[capacity];
+}
+```
+`AbstractStringBuilder`内部用一个`char[]`数组保存字符串，可以在构造的时候指定初始容量方法。
+### 扩容
+```java
+public void ensureCapacity(int minimumCapacity) {
+    if (minimumCapacity > 0)
+        ensureCapacityInternal(minimumCapacity);
+}
+ private void ensureCapacityInternal(int minimumCapacity) {
+    // overflow-conscious code
+    if (minimumCapacity - value.length > 0)
+        expandCapacity(minimumCapacity);
+}
+void expandCapacity(int minimumCapacity) {
+    int newCapacity = value.length * 2 + 2;
+    if (newCapacity - minimumCapacity < 0)
+        newCapacity = minimumCapacity;
+    if (newCapacity < 0) {
+        if (minimumCapacity < 0) // overflow
+            throw new OutOfMemoryError();
+        newCapacity = Integer.MAX_VALUE;
+    }
+    value = Arrays.copyOf(value, newCapacity);
+}
+```
+扩容的方法最终是由`expandCapacity()`实现的，在这个方法中首先把容量扩大为**原来的容量加2**，如果此时仍小于指定的容量，那么就把新的容量设为`minimumCapacity`。然后判断是否溢出，如果溢出了，把容量设为`Integer.MAX_VALUE`。最后把`value`值进行拷贝，**这显然是耗时操作**。
+### append()方法
+```java
+public AbstractStringBuilder append(String str) {
+        if (str == null)
+            return appendNull();
+        int len = str.length();
+        ensureCapacityInternal(count + len);
+        str.getChars(0, len, value, count);
+        count += len;
+        return this;
+    }
+```
+`append()`是最常用的方法，它有很多形式的重载。上面是其中一种，用于追加字符串。如果`str`是`null`,则会调用`appendNull()`方法。这个方法其实是追加了`'n'`、`'u'`、`'l'`、`'l'`这几个字符。如果不是`null`，则首先扩容，然后调用`String`的`getChars()`方法将`str`追加到`value`末尾。最后返回对象本身，所以`append()`可以连续调用。
+## StringBuilder
+`AbstractStringBuilder`已经实现了大部分需要的方法，`StringBuilder`和`StringBuffer`只需要调用即可。下面来看看`StringBuilder`的实现。
+### 构造器
+```java
+public StringBuilder() {
+    super(16);
+}
+public StringBuilder(int capacity) {
+    super(capacity);
+}
+public StringBuilder(String str) {
+    super(str.length() + 16);
+    append(str);
+}
+public StringBuilder(CharSequence seq) {
+    this(seq.length() + 16);
+    append(seq);
+}
+```
+可以看出，`StringBuilder`**默认的容量大小为16**。当然也可以指定初始容量，或者以一个已有的字符序列给`StringBuilder`对象赋初始值。
+### append()方法
+```java
+public StringBuilder append(String str) {
+    super.append(str);
+    return this;
+}
+public StringBuilder append(CharSequence s) {
+    super.append(s);
+    return this;
+}
+```
+`append()`的重载方法很多，这里随便列举了两个。显然，这里是直接调用的父类`AbstractStringBuilder`中的方法。
+### toString()
+```java
+public String toString() {
+    // Create a copy, don't share the array
+    return new String(value, 0, count);
+}
+```
+`toString()`方法返回了一个新的`String`对象，与原来的对象不共享内存。其实`AbstractStringBuilder`中的`subString()`方法也是如此。
+## StringBuffer
+`StiringBuffer`跟`StringBuilder`类似，只不过为了实现同步，很多方法使用`Synchronized`修饰，如下面的方法：
+```java
+public synchronized int length() {
+        return count;
+}
+public synchronized StringBuffer append(String str) {
+    toStringCache = null;
+    super.append(str);
+    return this;
+}
+public synchronized void setLength(int newLength) {
+    toStringCache = null;
+    super.setLength(newLength);
+}
+```
+可以看到，方法前面确实加了`Synchronized`。
+另外，在上面的`append()`以及`setLength()`方法里面还有个变量`toStringCache`。这个变量是用于最近一次`toString()`方法的缓存，任何时候只要`StringBuffer`被修改了这个变量会被赋值为`null`。`StringBuffer`的`toString`如下：
+```java
+public synchronized String toString() {
+    if (toStringCache == null) {
+        toStringCache = Arrays.copyOfRange(value, 0, count);
+    }
+    return new String(toStringCache, true);
+}
+```
+在这个方法中，如果`toStringCache`为`null`则先缓存。最终返回的`String`对象有点不同，这个构造方法还有个参数`true`。找到`String`的源码看一下：
+```java
+String(char[] value, boolean share) {
+    // assert share : "unshared not supported";
+    this.value = value;
+}
+```
+原来这个构造方法构造出来的`String`对象并没有实际复制字符串，只是把`value`指向了构造参数，这是为了节省复制元素的时间。不过这个构造器是具有包访问权限，一般情况下是不能调用的。
+## 总结
+- `StringBuilder`和`StringBuffer`都是可变字符串，前者线程不安全，后者线程安全。
+- `StringBuilder`和`StringBuffer`的大部分方法均调用父类`AbstractStringBuilder`的实现。其扩容机制首先是把容量变为原来容量的2倍加2。最大容量是`Integer.MAX_VALUE`，也就是`0x7fffffff`。
+- `StringBuilder`和`StringBuffer`的默认容量都是16，最好预先估计好字符串的大小避免扩容带来的时间消耗。
 # LinkedHashMap
 
 # CopyOnWriteArrayList

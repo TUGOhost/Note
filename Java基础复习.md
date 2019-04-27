@@ -97,15 +97,132 @@ String不可变性天生具备线程安全，可以在多个线程中安全地�
 - StringBuilder不是线程安全的
 - StringBuffer是线程安全的，内部使用synchronized进行同步
 ### String.intern()
+使用String.intern()可以保证相同用内容的字符串变量引用同一的内存对象。
+下面示例中，s1和s2采用new String()的方式新建了两个不同对象，而s3是通过s1.intern()方法取得一个对象引用。intern()首先把s1引用的对象放到String Pool（字符串常量池）中，然后返回这个对象引用。因此s3和s1引用的是同一个字符串常量池的对象。
+```java
+String s1 = new String("aaa");
+String s2 = new String("aaa");
+System.out.println(s1 == s2); // false
+String s3 = s1.intern();
+System.out.println(s1.intern() == s3); // true
+```
+如果是采用"bbb"这种使用双引号的形式创建字符串实例，会自动地将新建的对象放入String Pool中。
+```java
+String s4 = "bbb";
+String s5 = "bbb";
+System.out.println(s4 == s5); // true
+```
+在Java 7之前，字符串常量池被放在运行时常量池中，它属于永久代。而在Java 7，字符串常量池被移到Native Method中。这是因为永久代的空间有限，在大量使用字符串的场景下会导致OutOfMemoryError错误。
 ## 运算
 ### 参数传递
 ### 隐式类型转换
 ### switch
 ## 继承
 ### 访问权限
+Java中有三个访问权限修饰符：private、protected以及public，如果不加访问修饰符，表示包级可见。
+可以对类或类中的成员（字段以及方法）加上访问修饰符。
+- 类可见表示其他类可以用这个类创建实例对象。
+- 成员可见表示其他类可以用这个类的实例对象访问到该对象；
+
+protected用于修饰成员，表示在继承体系中成员对于子类可见，但是这个访问修饰符对于类没有意义。
+设计良好的模块会隐藏所有的实现细节，把它的API与它的实现清晰地隔离开来。模块之间只能通过他们的API进行通信，一个模块不需要知道其他模块的内部工作情况，这个概念被成为信息隐藏或封装。因此访问权限应当尽可能地使每个类或者成员不被外界访问。
+如果子类地方法重写了父类地方法，那么子类中该方法地访问级别不允许低于夫类的访问级别。这是为了确保可以使用父类实例的地方都可以使用子类实例，也就是确保满足里氏替换原则。
+字段绝不能是公有的，因为这么做的话就失去了对这个字段修改行为的控制，客户端可以对其随意修改。例如下面的例子，AccessExample拥有id共有字段，如果在某个时刻，我们想要使用int去存储id字段，那么就需要去修改所有的客户端代码。
+```java
+public class AccessExample{
+    public String id;
+}
+```
+可以使用公有的getter和setter方法来替换公有字段，这样的话就可以控制对字段的修改行为。
+```java
+public class AccessExample{
+    private int id;
+    public String getId(){
+        return id + "";
+    }
+    public void setId(String id){
+        this.id = Integer.valueOf(id);
+    }
+}
+```
+但是也有例外，如果是包级私有的类或者私有的嵌套类，那么直接暴露成员不会有特别大的影响。
+```java
+public class AccessWithInnerClassExample{
+    private class InnerClass{
+        int x;
+    }
+    private AccessWithInnerClassExample(){
+        innerClass = new InnerClass();
+    }
+    public int getValue(){
+        return innerClass.x;
+    }
+}
+```
 ### 抽象类与接口类
+#### 1.抽象类
+抽象类和抽象方法都使用abstrac关键字进行声明。抽象类一般会包含抽象方法，抽象方法一定位于抽象类中。
+抽象类和普通类最大的区别是，抽象列不能被实例化，需要继承抽象类才能实例化其子类。
+```java
+public abstract classs AbstractClassExample{
+    protected int x;
+    private int y;
+    public abstract void func1();
+    public void func2(){
+        System.out.println("func2");
+    }
+}
+```
+```java
+public class AbstractExtendClassExample extends AbstractClassExample{
+    @Override
+    public void func1(){
+        System.out.println("funct1");
+    }
+}
+```
+#### 2.接口
+接口是抽象类的延伸，在Java 8之前，他可以看成是一个完全抽象的类，也就是说它不能有任何的方法实现。
+从Java 8开始，接口也可以拥有默认的方法实现，这是因为不支持默认方法的接口的维护成本太高了。在Java 8之前，如果一个接口想要添加新的方法，那么要修改所有实现该接口的类。
+接口的成员（字段 + 方法）默认都是public的，并且不允许定义为private或者protected。
+接口的字段默认都是static和final的。
+```java
+public interface InterfaceExample{
+    void func1();
+    default void func2(){
+        System.out.println("func2");
+    }
+    int x = 123;
+}
+```
+```java
+public class InterfaceImplementExample implements InterfaceExample {
+    @Overrid
+    public void func1(){
+        System.out.println("func1");
+    }
+}
+```
+#### 3.比较
+- 从设计层面上看，抽象类提供了一种IS-A关系，那么就必须满足里氏替换原则，即子类对象必须能够替换掉所有父类对象。而接口更像是一种LIKE-A关系，它只是提供一种方法实现契约，并不要求接口和实现接口的类具有IS-A关系。
+- 从使用上看，一个类可以实现多个接口，但是不能继承多个抽象类。
+- 接口的字段只能是static和final类型的，而抽象类的字段没有这种限制。
+- 接口的成员只能是public的，而抽象类的成员可以有多种访问权限。
+#### 4.使用选择
+使用接口：
+- 需要让不想关的类都实现一个方法，例如不相关的类都可以实现Compareable接口中的compareTo()方法；
+- 需要使用多重继承。
+使用抽象类：
+- 需要在几个相关的类中共享代码。
+- 需要能控制继承来的成员的访问权限，而不是都为public
+- 需要继承非静态和非常量字段。
+在很多情况下，接口优先于抽象类，因为接口没有抽象类严格的类层次结构要求，可以灵活地为一个类添加行为。并且从Java 8开始，接口也可以有默认地方法实现，使得修改接口的成本也变的很低。
 ### super
+- 访问父类的构造函数：可以使用super()函数访问父类的构造函数，从而委托父类完成一些初始化的工作。
+- 访问父类的成员：如果子类重写了父类的中某个方法的实现，可以通过使用super关键字来引用父类的方法实现。
 ### 重写和重载
+- 重写（override）存在于继承体系中，指子类实现了一个父类在方法声明上完全相同的一个方法。子类的返回值类型要等于或者小于父类的返回值；
+- 重载（overload）存在于同一个类中，指一个方法已经存在的方法名称上相同，但是参数类型、个数、顺序至少有一个不同。应该注意的是，返回值不同，其他都是相同不算是重载。
 ## Object通用方法
 ### 概览
 ### equals()

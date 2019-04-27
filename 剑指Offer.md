@@ -2638,7 +2638,9 @@ public class Solution {
 输出
 > 7
 ### 分析
-看似很简单的题目，但是要考虑时间复杂度不能太高，因为输入的数组可能非常大。
+看似很简单的题目，但是要考虑时间复杂度不能太高，因为输入的数组可能非常大。归并排序的改进，把数据分成前后两个数组(递归分到每个数组仅有一个数据项)，合并数组，合并时，出现前面的数组值array[i]大于后面数组值array[j]时；则前面
+数组array[i]~array[mid]都是大于array[j]的，count += mid+1 - i + 1 。
+
 ### 贴出代码
 ```java
 public class Solution {
@@ -2672,7 +2674,7 @@ public class Solution {
                 tmp[k ++] = a[i ++];
             }else {
                 tmp[k ++] = a[j ++];
-                cnt += mid - i + 1;
+                cnt += mid - i + 1; // core
                 cnt %= 1000000007;
             }
         }
