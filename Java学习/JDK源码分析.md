@@ -3899,8 +3899,140 @@ String(char[] value, boolean share) {
 - `accessOrder=true`的模式下,在`afterNodeAccess()`函数中，会将当前**被访问**到的节点e，**移动**至内部的双向链表**的尾部**。值得注意的是，`afterNodeAccess()`函数中，会修改`modCount`,因此当你正在`accessOrder=true`的模式下,迭代`LinkedHashMap`时，如果同时查询访问数据，也会导致`fail-fast`，因为迭代的顺序已经改变.
 - `nextNode()`就是迭代器里的`next()`方法。该方法的实现可以看出，迭代`LinkedHashMap`，就是从**内部维护的双链表的表头开始循环输出**。而双链表节点的顺序在`LinkedHashMap`的**增、删、改、查时都会更新。以满足按照插入顺序输出，还是访问顺序输出**.
 - 它与`HashMap`比，还有一个小小的优化，重写了`containsValue()`方法，直接遍历内部链表去比对value值是否相等.
-# CopyOnWriteArrayList
 
+# WeakHashMap
+
+# CopyOnWriteArrayList
+## 概述
+CopyOnWriteArrayList是一个线程安全集合，原理简单说就是：在保证线程安全的前提下，牺牲掉写操作的效率来保证读操作的高效。所谓CopyOnWrite就是通过复制的方式来完成对数据的修改，在进行修改的时候，复制一个新数组，在新数组上面进行修改操作，这样就保证了不改变老数组，也就没有一写多读数据不一致的问题了。
+## 定义
+```java
+public class CopyOnWriteArrayList<E>
+    implements List<E>, RandomAccess, Cloneable, java.io.Serializable
+```
+## 属性
+一个是Lock，另一个是一个对象数组。
+```java
+/** The lock protecting all mutators */
+    final transient ReentrantLock lock = new ReentrantLock();
+
+    /** The array, accessed only via getArray/setArray. */
+    private transient volatile Object[] array;
+```
+## 初始化
+CopyOnWriteArrayList的初始容量是0，分为这样的几个步骤：
+```java
+/**
+     * Creates an empty list.
+     */
+    public CopyOnWriteArrayList() {
+        setArray(new Object[0]);
+    }
+/**
+     * Sets the array.
+     */
+    final void setArray(Object[] a) {
+        array = a;
+    }
+```
+需要说明的是另一个有参构造方法，参数可以是一个集合
+```java
+/**
+     * Creates a list containing the elements of the specified
+     * collection, in the order they are returned by the collection's
+     * iterator.
+     *
+     * @param c the collection of initially held elements
+     * @throws NullPointerException if the specified collection is null
+     */
+    public CopyOnWriteArrayList(Collection<? extends E> c) {
+        Object[] elements;
+        if (c.getClass() == CopyOnWriteArrayList.class)
+            elements = ((CopyOnWriteArrayList<?>)c).getArray();
+        else {
+            elements = c.toArray();
+            // c.toArray might (incorrectly) not return Object[] (see 6260652)
+            if (elements.getClass() != Object[].class)
+                elements = Arrays.copyOf(elements, elements.length, Object[].class);
+        }
+        setArray(elements);
+    }
+```
+## 方法
+### add(E e)
+```java
+/**
+     * Appends the specified element to the end of this list.
+     *
+     * @param e element to be appended to this list
+     * @return {@code true} (as specified by {@link Collection#add})
+     */
+    public boolean add(E e) {
+        // 锁 1.5 版本的锁 已经不用synchronizated
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            Object[] elements = getArray();
+            int len = elements.length;
+            Object[] newElements = Arrays.copyOf(elements, len + 1);
+            newElements[len] = e;
+            setArray(newElements);
+            return true;
+        } finally {
+            lock.unlock();
+        }
+    }
+```
+从add方法中我们可以看到所谓的CopyOnWrite是如何实现的，在需要修改的时候，复制一个新数组，在新数组上修改，修改结束取代老数组，这样保证了修改操作不影响老数组的正常读取，另修改操作是加锁的，也就是说没有了线程不安全的问题。
+
+和ArrayList相比较，效率比较低，只添加一个元素的情况下（初始容量均为0），用时是ArrayList的5倍左右，但是随着CopyOnWriteArrayList中元素的增加，CopyOnWriteArrayList的修改代价将越来越昂贵。
+
+除了添加其他的修改操作也都是这样的套路，不做过多解释，如remove，也是加锁，复制新数组。
+```java
+/**
+     * Removes the element at the specified position in this list.
+     * Shifts any subsequent elements to the left (subtracts one from their
+     * indices).  Returns the element that was removed from the list.
+     *
+     * @throws IndexOutOfBoundsException {@inheritDoc}
+     */
+    public E remove(int index) {
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            Object[] elements = getArray();
+            int len = elements.length;
+            E oldValue = get(elements, index);
+            int numMoved = len - index - 1;
+            if (numMoved == 0)
+                setArray(Arrays.copyOf(elements, len - 1));
+            else {
+                Object[] newElements = new Object[len - 1];
+                System.arraycopy(elements, 0, newElements, 0, index);
+                System.arraycopy(elements, index + 1, newElements, index,
+                                 numMoved);
+                setArray(newElements);
+            }
+            return oldValue;
+        } finally {
+            lock.unlock();
+        }
+    }
+```
+### get
+```java
+public E get(int index) {
+  return get(getArray(), index);
+}
+//按照下标获取数组中对应的元素
+private E get(Object[] a, int index) {
+  return (E) a[index];
+}
+```
+读取的方法就很简单了，按照下标获取对应的元素。
+## 总结
+1. 读写分离，我们修改的是新数组，读取的是老数组，不是一个对象，实现了读写分离。这种技术数据库用的非常多，在高并发下为了缓解数据库的压力，即使做了缓存也要对数据库做读写分离，读的时候使用读库，写的时候使用写库，然后读库、写库之间进行一定的同步，这样就避免同一个库上读、写的IO操作太多。
+2. 场景：读操作远多于修改操作
 # ConcurrentLinkedQueue
 
 # BlockingQueue
