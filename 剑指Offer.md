@@ -640,7 +640,7 @@ public class Solution {
 ### 题目描述
 定义栈的数据结构，请在该类型中实现一个能够得到栈中所含最小元素的min函数（时间复杂度应为O（1））。
 ###分析
-
+要求min函数的时间复杂度为O（1），所以让min函数直接返回最小值即可。然后就是定义好栈的数据结构，并定义好最小值，查找到最小值即可。
 ### 贴出代码
 ```java
 import java.util.Stack;
@@ -648,14 +648,18 @@ import java.util.Arrays;
 
 public class Solution {
 
+    // 栈空间
     private int size;
+    // 最小值
     private int min = Integer.MAX_VALUE;
+    // 直接使用api的栈结构 
     private Stack<Integer> minStack = new Stack<Integer>();
-    private Integer[] elements = new Integer[10];
+    private Integer[] elements = new Integer[10]; 
 
     public void push(int node) {
         ensureCapacity(size+1);
         elements[size++] = node;
+        // 如果node比min还小则入站和交换
         if (node <= min){
             minStack.push(node);
             min = minStack.peek();
@@ -664,6 +668,7 @@ public class Solution {
         }
     }
 
+    // 确保长度不越界
     private void ensureCapacity(int size ){
         int len = elements.length;
         if(size > len){
@@ -1364,7 +1369,7 @@ public class Solution {
 ### 题目描述
 输入一个正整数数组，把数组里所有数字拼接起来排成一个数，打印能拼接出的所有数字中最小的一个。例如输入数组{3，32，321}，则打印出这三个数字能排成的最小数字为321323。
 ### 分析
-
+迭代器找出最小数字，注意使用迭代器功能。
 ### 贴出代码
 ```java
 import java.util.ArrayList;
@@ -1372,10 +1377,9 @@ import java.util.Comparator;
 import java.util.Collections;
 public class Solution {
     public String PrintMinNumber(int [] numbers) {
-        int n;
+        int n = numbers.length;
 		String s = "";
 		ArrayList<Integer> list = new ArrayList<Integer>();
-		n = numbers.length;
 		for(int i = 0; i < n; i++) {
 			list.add(numbers[i]);
 		}
@@ -1509,7 +1513,7 @@ public class Solution {
 > 2147483647
 >    0
 ### 分析
-
+如果字符串中存在字符，则返回0，如果没有则输出数字。
 ### 贴出代码
 ```java
 public class Solution {
@@ -1527,10 +1531,11 @@ public class Solution {
 			if(a[i] == '+') {
 				continue;
 			}
+            // 如果存在字母则返回0
 			if(a[i] < 48 || a[i] > 57) {
 				return 0;
 			}
-			sum = sum * 10 + a[i] -48;
+			sum = sum * 10 + a[i] - 48;
 		}
 		return fuhao == 0 ? sum : sum * -1;
     }
@@ -1579,7 +1584,7 @@ public class Solution {
 ### 题目描述
 在一个字符串(0<=字符串长度<=10000，全部由字母组成)中找到第一个只出现一次的字符,并返回它的位置, 如果没有则返回 -1（需要区分大小写）.
 ### 分析
-
+先将字符串一个个的拆成字符，然后存到hashmap中，如果重复出现则输出。
 ### 贴出代码
 ```java
 import java.util.HashMap;
@@ -1613,7 +1618,7 @@ public class Solution {
 ### 题目描述
 如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。我们使用Insert()方法读取数据流，使用GetMedian()方法获取当前读取数据的中位数。
 ### 分析
-
+定义两个堆，大根堆、小根堆，然后直接取出大根堆和小根堆堆顶的平均数或者取出小根堆的堆顶即可。
 ### 贴出代码
 ```java
 import java.util.Comparator;
@@ -1652,8 +1657,6 @@ public class Solution {
             return new Double(minHeap.peek());
         }
     }
-
-
 }
 ```
 
@@ -1661,7 +1664,7 @@ public class Solution {
 ### 题目描述
 输入一个整数数组，实现一个函数来调整该数组中数字的顺序，使得所有的奇数位于数组的前半部分，所有的偶数位于数组的后半部分，并保证奇数和奇数，偶数和偶数之间的相对位置不变。
 ### 分析
-
+如果是偶数则交换，不是则保留。
 ### 贴出代码
 ```java
 public class Solution {
@@ -1837,7 +1840,6 @@ public class Solution {
         }
         return null;
     }
-
 }
 ```
 ## 滑动窗口的最大值
@@ -2317,7 +2319,7 @@ public class Solution {
 ### 题目描述
 输入n个整数，找出其中最小的K个数。例如输入4,5,1,6,2,7,3,8这8个数字，则最小的4个数字是1,2,3,4,。
 ### 分析
-
+先将数组排序，再取前k个数。
 ### 贴出代码
 ```java
 import java.util.*;
@@ -2494,7 +2496,7 @@ public class Solution {
 ### 题目描述
 在一个排序的链表中，存在重复的结点，请删除该链表中重复的结点，重复的结点不保留，返回链表头指针。 例如，链表1->2->3->3->4->4->5 处理后为 1->2->5
 ### 分析
-
+遍历一遍链表，发现有没有重复的节点，如果有，则将重复节点前一个节点的next指针指向重复节点后面一个节点。
 ### 贴出代码
 ```java
 /*
@@ -2517,6 +2519,7 @@ public class Solution {
         while (p != null && p.next != null){
             if (p.val == p.next.val){
                 int val = p.val;
+                // 查看是否有重复的节点
                 while (p != null && p.val == val){
                     p = p.next;
                 }
