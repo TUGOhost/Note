@@ -137,3 +137,11 @@ vim /usr/java/apache-maven-3.3.9/conf/settings.xml
 
 然后参考这个[博客](https://blog.0x233.cn/2017/02/03/%E9%98%BF%E9%87%8C%E4%BA%91Maven%E9%95%9C%E5%83%8F%E4%BD%BF%E7%94%A8%E7%9A%84%E6%AD%A3%E7%A1%AE%E5%A7%BF%E5%8A%BF/)来更改maven设置。
 
+### mysql安装
+由于作为测试服务器使用，所以使用yum快速安装。如下：
+
+yum install mariadb mariadb-server
+systemctl start mariadb   #启动mariadb
+systemctl enable mariadb  #设置开机自启动
+mysql_secure_installation #设置root密码等相关
+mysql -uroot -p           #测试登录

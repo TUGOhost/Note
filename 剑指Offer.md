@@ -1945,7 +1945,7 @@ public class Solution {
 ### 题目描述
 请实现一个函数按照之字形打印二叉树，即第一行按照从左到右的顺序打印，第二层按照从右至左的顺序打印，第三行按照从左到右的顺序打印，其他行以此类推。
 ### 分析
-
+按之字形顺序打印二叉树需要两个栈。我们在打印某一行结点时，把下一层的子结点保存到相应的栈里。如果当前打印的是奇数层，则先保存左子结点再保存右子结点到一个栈里；如果当前打印的是偶数层，则先保存右子结点再保存左子结点到第二个栈里。
 ### 贴出代码
 ```java
 import java.util.*;
@@ -1964,11 +1964,13 @@ public class TreeNode {
 */
 public class Solution {
     public ArrayList<ArrayList<Integer> > Print(TreeNode pRoot) {
+        // 当前层数
         int layer = 1;
-
+        // 存奇数层节点
         Stack<TreeNode> s1 = new Stack<TreeNode>();
         s1.push(pRoot);
 
+        // 存偶数层节点
         Stack<TreeNode> s2 = new Stack<TreeNode>();
 
         ArrayList<ArrayList<Integer>> list = new ArrayList<ArrayList<Integer>>();
