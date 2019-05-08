@@ -2129,171 +2129,203 @@ class Solution {
     }
 }
 ```
-## 三个数的最大乘积
+
+## 19. 删除链表的倒数第N个节点
 ### 题目描述
+给定一个链表，删除链表的倒数第 n 个节点，并且返回链表的头结点。
 
-给定一个整型数组，在数组中找出由三个数组成的最大乘积，并输出这个乘积。
-
-**示例 1:**
-
+**示例**：
 ```
-输入: [1,2,3]
-输出: 6
+给定一个链表: 1->2->3->4->5, 和 n = 2.
+当删除了倒数第二个节点后，链表变为 1->2->3->5.
 ```
-
-**示例 2:**
-
+**说明**：
+给定的 n 保证是有效的。
+**进阶**：
+你能尝试使用一趟扫描实现吗？
+### 分析
+#### 两次遍历
+首先我们将添加一个哑结点作为辅助，该结点位于列表头部。哑结点用来简化某些极端情况，例如列表中只含有一个结点，或需要删除列表的头部。在第一次遍历中，我们找出列表的长度 LL。然后设置一个指向哑结点的指针，并移动它遍历列表，直至它到达第 (L - n)(L−n) 个结点那里。我们把第 (L - n)(L−n) 个结点的 next 指针重新链接至第 (L - n + 2)(L−n+2) 个结点，完成这个算法。
+#### 一次遍历
+上述算法可以优化为只使用一次遍历。我们可以使用两个指针而不是一个指针。第一个指针从列表的开头向前移动 n+1n+1 步，而第二个指针将从列表的开头出发。现在，这两个指针被 nn 个结点分开。我们通过同时移动两个指针向前来保持这个恒定的间隔，直到第一个指针到达最后一个结点。此时第二个指针将指向从最后一个结点数起的第 nn 个结点。我们重新链接第二个指针所引用的结点的 next 指针指向该结点的下下个结点。
+### 贴出代码
+两次遍历
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        int length = 0;
+        ListNode first = head;
+        while (first != null){
+            length ++;
+            first = first.next;
+        }
+        length -= n;
+        first = dummy;
+        while (length > 0){
+            length --;
+            first = first.next;
+        }
+        first.next = first.next.next;
+        return dummy.next;
+    }
+}
 ```
-输入: [1,2,3,4]
-输出: 24
+一次遍历
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode first = dummy;
+        ListNode second = dummy;
+        for (int i = 1; i <= n + 1; i ++){
+            first = first.next;
+        }
+
+        while (first != null){
+            first = first.next;
+            second = second.next;
+        }
+
+        second.next = second.next.next;
+        return dummy.next;
+    }
+}
 ```
-
-**注意:**
-
-1. 给定的整型数组长度范围是[3,104]，数组中所有的元素范围是[-1000, 1000]。
-2. 输入的数组中任意三个数的乘积不会超出32位有符号整数的范围。
-
+## 83. 删除排序链表中的重复元素
+### 题目描述
+给定一个排序链表，删除所有重复的元素，使得每个元素只出现一次。
+**示例 1**:
+```
+输入: 1->1->2
+输出: 1->2
+```
+**示例 2**:
+```
+输入: 1->1->2->3->3
+输出: 1->2->3
+```
 ### 分析
 
 ### 贴出代码
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode deleteDuplicates(ListNode head) {
+        ListNode currentNode = head;
+        while(currentNode != null && currentNode.next != null){
+            if(currentNode.val == currentNode.next.val){
+                currentNode.next = currentNode.next.next;
+            }else{
+                currentNode = currentNode.next;
+            }
+        }
+        return head;
+    }
+}
+```
 
-## 较大分组的位置
+## 206. 反转链表
 ### 题目描述
-
-在一个由小写字母构成的字符串 `S` 中，包含由一些连续的相同字符所构成的分组。
-
-例如，在字符串 `S = "abbxxxxzyy"` 中，就含有 `"a"`, `"bb"`, `"xxxx"`, `"z"` 和 `"yy"` 这样的一些分组。
-
-我们称所有包含大于或等于三个连续字符的分组为较大分组。找到每一个较大分组的起始和终止位置。
-
-最终结果按照字典顺序输出。
-
-**示例 1:**
-
+反转一个单链表。
+**示例**:
 ```
-输入: "abbxxxxzzy"
-输出: [[3,6]]
-解释: "xxxx" 是一个起始于 3 且终止于 6 的较大分组。
+输入: 1->2->3->4->5->NULL
+输出: 5->4->3->2->1->NULL
 ```
-
-**示例 2:**
-
-```
-输入: "abc"
-输出: []
-解释: "a","b" 和 "c" 均不是符合要求的较大分组。
-```
-
-**示例 3:**
-
-```
-输入: "abcdddeeeeaabbbcd"
-输出: [[3,5],[6,9],[12,14]]
-```
-
-**说明:**  `1 <= S.length <= 1000`
-
+**进阶**:
+你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
 ### 分析
 
 ### 贴出代码
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    // 迭代的方式
+    public ListNode reverseList(ListNode head) {
+        ListNode prev = null;
+        ListNode curr = head;
+        while(curr != null){
+            ListNode nextTemp = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = nextTemp;
+        }
+        return prev;
+    }
+}
+```
 
-## 使用最小花费爬楼梯
+## 92. 反转链表 II
 ### 题目描述
-
-数组的每个索引做为一个阶梯，第 `i`个阶梯对应着一个非负数的体力花费值 `cost[i]`(索引从0开始)。
-
-每当你爬上一个阶梯你都要花费对应的体力花费值，然后你可以选择继续爬一个阶梯或者爬两个阶梯。
-
-您需要找到达到楼层顶部的最低花费。在开始时，你可以选择从索引为 0 或 1 的元素作为初始阶梯。
-
-**示例 1:**
-
+反转从位置 m 到 n 的链表。请使用一趟扫描完成反转。
+**说明**:
+1 ≤ m ≤ n ≤ 链表长度。
+**示例**:
 ```
-输入: cost = [10, 15, 20]
-输出: 15
-解释: 最低花费是从cost[1]开始，然后走两步即可到阶梯顶，一共花费15。
+输入: 1->2->3->4->5->NULL, m = 2, n = 4
+输出: 1->4->3->2->5->NULL
 ```
-
- **示例 2:**
-
-```
-输入: cost = [1, 100, 1, 1, 1, 100, 1, 1, 100, 1]
-输出: 6
-解释: 最低花费方式是从cost[0]开始，逐个经过那些1，跳过cost[3]，一共花费6。
-```
-
-**注意：**
-
-1. `cost` 的长度将会在 `[2, 1000]`。
-2. 每一个 `cost[i]` 将会是一个Integer类型，范围为 `[0, 999]`。
-
 ### 分析
 
 ### 贴出代码
-
-## 至少是其他数字两倍的最大数
-### 题目描述
-
-在一个给定的数组`nums`中，总是存在一个最大元素 。
-
-查找数组中的最大元素是否至少是数组中每个其他数字的两倍。
-
-如果是，则返回最大元素的索引，否则返回-1。
-
-**示例 1:**
-
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode reverseBetween(ListNode head, int m, int n) {
+        ListNode dummy = new ListNode(0);
+        dummy.next= head;
+        ListNode pre = dummy;
+        for(int i = 1; i < m; i ++){
+            pre = pre.next;
+        }
+        head = pre.next;
+        for(int i = m; i < n; i ++){
+            ListNode nex = head.next;
+            head.next = nex.next;
+            nex.next = pre.next;
+            pre.next = nex;
+        }
+        return dummy.next;
+    }
+}
 ```
-输入: nums = [3, 6, 1, 0]
-输出: 1
-解释: 6是最大的整数, 对于数组中的其他整数,
-6大于数组中其他元素的两倍。6的索引是1, 所以我们返回1.
-```
-
- 
-
-**示例 2:**
-
-```
-输入: nums = [1, 2, 3, 4]
-输出: -1
-解释: 4没有超过3的两倍大, 所以我们返回 -1.
-```
-
- 
-
-**提示:**
-
-1. `nums` 的长度范围在`[1, 50]`.
-2. 每个 `nums[i]` 的整数范围在 `[0, 99]`.
-
-### 分析
-
-### 贴出代码
-
-## 最长连续递增序列
-### 题目描述
-
-给定一个未经排序的整数数组，找到最长且**连续**的的递增序列。
-
-**示例 1:**
-
-```
-输入: [1,3,5,4,7]
-输出: 3
-解释: 最长连续递增序列是 [1,3,5], 长度为3。
-尽管 [1,3,5,7] 也是升序的子序列, 但它不是连续的，因为5和7在原数组里被4隔开。 
-```
-
-**示例 2:**
-
-```
-输入: [2,2,2,2,2]
-输出: 1
-解释: 最长连续递增序列是 [2], 长度为1。
-```
-
-**注意：**数组长度不会超过10000。
-
-### 分析
-
-### 贴出代码
