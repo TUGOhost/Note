@@ -2225,6 +2225,8 @@ class Solution {
 ```
 ### 分析
 
+如果当前指针指向的值和它next指针指向的值相同，则currentNode.next = currentNode.next.next。
+
 ### 贴出代码
 ```java
 /**
@@ -2261,6 +2263,8 @@ class Solution {
 **进阶**:
 你可以迭代或递归地反转链表。你能否用两种方法解决这道题？
 ### 分析
+
+设置一个tmp指针，作为交换的中介，prev和curr指针不断交换，然后返回prev。
 
 ### 贴出代码
 ```java
@@ -2300,6 +2304,8 @@ class Solution {
 ```
 ### 分析
 
+在m位置之前，只需要下一个就可以了，m到n之间，交换。
+
 ### 贴出代码
 ```java
 /**
@@ -2329,3 +2335,455 @@ class Solution {
     }
 }
 ```
+
+## 61. 旋转链表
+
+### 题目描述
+
+给定一个链表，旋转链表，将链表每个节点向右移动 *k* 个位置，其中 *k* 是非负数。
+
+**示例 1:**
+
+```
+输入: 1->2->3->4->5->NULL, k = 2
+输出: 4->5->1->2->3->NULL
+解释:
+向右旋转 1 步: 5->1->2->3->4->NULL
+向右旋转 2 步: 4->5->1->2->3->NULL
+```
+
+**示例 2:**
+
+```
+输入: 0->1->2->NULL, k = 4
+输出: 2->0->1->NULL
+解释:
+向右旋转 1 步: 2->0->1->NULL
+向右旋转 2 步: 1->2->0->NULL
+向右旋转 3 步: 0->1->2->NULL
+向右旋转 4 步: 2->0->1->NULL
+```
+
+### 分析
+
+`k = (len + (k % len)) % len;`是关键，求出最少旋转几次，因为可能k比len还要大。然后使用快慢指针来交换。
+
+### 贴出代码
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode rotateRight(ListNode head, int k) {
+        if(head == null || k < 0){
+            return head;
+        }
+        ListNode tmp = new ListNode(0);
+        tmp.next = head;
+        ListNode slow = tmp;
+        ListNode fast = tmp;
+        int len = 0;
+        while(slow.next != null){
+            len ++;
+            slow = slow.next;
+        }
+        slow = tmp;
+        // 求出旋转多少次，因为可能k比len还要大
+        k = (len + (k % len)) % len;
+        if(k == 0){
+            return tmp.next;
+        }
+        while(-- k >= 0){
+            fast = fast.next;
+        }
+        while(fast.next != null){
+            fast = fast.next;
+            slow = slow.next;
+        }
+        tmp.next = slow.next;
+        fast.next = head;
+        slow.next = null;
+        return tmp.next;
+    }
+}
+```
+
+## 143. 重排链表
+
+### 题目描述
+
+给定一个单链表 *L*：*L*0→*L*1→…→*L**n*-1→*L*n ，
+ 将其重新排列后变为： *L*0→*L**n*→*L*1→*L**n*-1→*L*2→*L**n*-2→…
+
+你不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
+
+**示例 1:**
+
+```
+给定链表 1->2->3->4, 重新排列为 1->4->2->3.
+```
+
+**示例 2:**
+
+```
+给定链表 1->2->3->4->5, 重新排列为 1->5->2->4->3.
+```
+
+### 分析
+
+使用双向链表queue来存该单链表，再迭代一遍，如果当前指针cur是空的，则赋值双向链表前面的值，否则cur的next指针赋值最前面的值。
+
+### 贴出代码
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+import java.util.LinkedList;
+class Solution {
+    public void reorderList(ListNode head) {
+        LinkedList<ListNode> queue = new LinkedList<>();
+        ListNode cur = head;
+        while(cur != null){
+            queue.addLast(cur);
+            cur = cur.next;
+        }
+        while(!queue.isEmpty()){
+            if(cur == null){
+                cur = queue.pollFirst();
+            }else{
+                cur.next = queue.pollFirst();
+                cur = cur.next;
+            }
+            cur.next = queue.pollLast();
+            cur = cur.next;
+        }
+        if(cur != null){
+            cur.next = null;
+        }
+    }
+}
+```
+
+## 21. 合并两个有序链表
+
+### 题目描述
+
+将两个有序链表合并为一个新的有序链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
+
+**示例：**
+
+```
+输入：1->2->4, 1->3->4
+输出：1->1->2->3->4->4
+```
+
+### 分析
+
+类似于归并排序中的合并过程，如果任何一个（l1，l2）为空，直接链接另一条。
+
+### 贴出代码
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode dummy = new ListNode(0);
+        ListNode cur = dummy;
+        while(l1 != null && l2 != null){
+            if(l1.val < l2.val){
+                cur.next = l1;
+                cur = cur.next;
+                l1 = l1.next;
+            }else{
+                cur.next = l2;
+                cur = cur.next;
+                l2 = l2.next;
+            }
+        }
+        if(l1 == null){
+            cur.next = l2;
+        }else{
+            cur.next = l1;
+        }
+        return dummy.next;
+    }
+}
+```
+
+## 160. 相交链表
+
+### 题目描述
+
+编写一个程序，找到两个单链表相交的起始节点。
+
+如下面的两个链表**：**
+
+[![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png)](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png)
+
+在节点 c1 开始相交。
+
+ 
+
+**示例 1：**
+
+[![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_1.png)](https://assets.leetcode.com/uploads/2018/12/13/160_example_1.png)
+
+```
+输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3
+输出：Reference of the node with value = 8
+输入解释：相交节点的值为 8 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。
+```
+
+ 
+
+**示例 2：**
+
+[![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_2.png)](https://assets.leetcode.com/uploads/2018/12/13/160_example_2.png)
+
+```
+输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1
+输出：Reference of the node with value = 2
+输入解释：相交节点的值为 2 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。
+```
+
+ 
+
+**示例 3：**
+
+[![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_example_3.png)](https://assets.leetcode.com/uploads/2018/12/13/160_example_3.png)
+
+```
+输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2
+输出：null
+输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。
+解释：这两个链表不相交，因此返回 null。
+```
+
+ 
+
+**注意：**
+
+- 如果两个链表没有交点，返回 `null`.
+- 在返回结果后，两个链表仍须保持原有的结构。
+- 可假定整个链表结构中没有循环。
+- 程序尽量满足 O(*n*) 时间复杂度，且仅用 O(*1*) 内存。
+
+### 分析
+
+定义两个指针, 第一轮让两个到达末尾的节点指向另一个链表的头部, 最后如果相遇则为交点(在第一轮移动中恰好抹除了长度差)两个指针等于移动了相同的距离, 有交点就返回, 无交点就是各走了两条指针的长度。
+
+### 贴出代码
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if(headA == null || headB == null){
+            return null;
+        }
+        ListNode pA = headA, pB = headB;
+        // 在这里第一轮体现在pA和pB第一次到达尾部会移向另一链表的表头, 而第二轮体现在如果pA或pB相交就返回交点, 不相交最后就是null==null
+        while(pA != pB){
+            pA = pA == null ? headB : pA.next;
+            pB = pB == null ? headA : pB.next;
+        }
+        return pA;
+    }
+}
+```
+
+## 141. 环形链表
+
+### 题目描述
+
+给定一个链表，判断链表中是否有环。
+
+为了表示给定链表中的环，我们使用整数 `pos` 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 `pos` 是 `-1`，则在该链表中没有环。
+
+ 
+
+**示例 1：**
+
+```
+输入：head = [3,2,0,-4], pos = 1
+输出：true
+解释：链表中有一个环，其尾部连接到第二个节点。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist.png)
+
+**示例 2：**
+
+```
+输入：head = [1,2], pos = 0
+输出：true
+解释：链表中有一个环，其尾部连接到第一个节点。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test2.png)
+
+**示例 3：**
+
+```
+输入：head = [1], pos = -1
+输出：false
+解释：链表中没有环。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test3.png)
+
+ 
+
+**进阶：**
+
+你能用 *O(1)*（即，常量）内存解决此问题吗？
+
+### 分析
+
+使用快慢指针，如果相遇则有环。
+
+### 贴出代码
+
+```java
+/**
+ * Definition for singly-linked list.
+ * class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        if(head == null || head.next == null){
+            return false;
+        }
+        
+        ListNode slow = head;
+        ListNode fast = head.next;
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+            if(slow == fast){
+                return true;
+            }
+        }
+        return false;
+    }
+}
+```
+
+## 147. 对链表进行插入排序
+
+### 题目描述
+
+对链表进行插入排序。
+
+![img](https://upload.wikimedia.org/wikipedia/commons/0/0f/Insertion-sort-example-300px.gif)
+ 插入排序的动画演示如上。从第一个元素开始，该链表可以被认为已经部分排序（用黑色表示）。
+ 每次迭代时，从输入数据中移除一个元素（用红色表示），并原地将其插入到已排好序的链表中。
+
+ 
+
+**插入排序算法：**
+
+1. 插入排序是迭代的，每次只移动一个元素，直到所有元素可以形成一个有序的输出列表。
+2. 每次迭代中，插入排序只从输入数据中移除一个待排序的元素，找到它在序列中适当的位置，并将其插入。
+3. 重复直到所有输入数据插入完为止。
+
+ 
+
+**示例 1：**
+
+```
+输入: 4->2->1->3
+输出: 1->2->3->4
+```
+
+**示例 2：**
+
+```
+输入: -1->5->3->4->0
+输出: -1->0->3->4->5
+```
+
+### 分析
+
+跳过开头已经有序的部分，对剩下的无序部分进行插入排序。但是时间复杂度还是很高。
+
+### 贴出代码
+
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode insertionSortList(ListNode head) {
+        if(head == null || head.next == null){
+             return head;
+        }
+        ListNode dummy = new ListNode(0), sorted = head;
+        dummy.next = head;
+        while(sorted != null && sorted.next != null && sorted.val < sorted.next.val){
+            sorted = sorted.next;
+        }
+        while(sorted != null && sorted.next != null){
+            ListNode curr = sorted.next;
+            sorted.next = curr.next;
+            ListNode pp = dummy, p = dummy.next;
+            while(p != sorted && curr.val > p.val){
+                pp = pp.next;
+                p = p.next;
+            }
+            if(p != sorted || curr.val <= sorted.val){
+                curr.next = p;
+                pp.next = curr;
+            }else{
+                curr.next = sorted.next;
+                sorted.next = curr;
+                sorted = sorted.next;
+            }
+            curr = curr.next;
+        }
+        return dummy.next;
+    }
+}
+```
+

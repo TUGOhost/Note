@@ -40,7 +40,7 @@
 - ##### 乐优商城(微服务学习):
   - [GitHub地址](https://github.com/TUGOhost/leyou)
   - 开发时间: 2019.01 - 2019.03
-  - 项目描述: 该项目相当于宿舍小卖铺的升级版版，使用`Spring Cloud`作为微服务框架，`Spring Boot`作为项目的子服务，使用了`Netflix Zuul`作为网关处理，`Netflix Eureka`作为注册中心用于注册服务和订阅服务，`Ribbon`作为负载均衡，`Hstix`作为失败容错，利用`RabbitMQ`作为消息队列进行发送消息、接收消息；使用`MySQL`作为数据层的主数据库，使用`Redis`作为数据层的缓存使用，使用`FastDFS`作为图片文件存储系统。
+  - 项目描述: 该项目相当于宿舍小卖铺的升级版版，使用`Spring Cloud`作为微服务框架，`Spring Boot`作为项目的子服务，使用了`Netflix Zuul`作为网关处理，`Netflix Eureka`作为注册中心用于注册服务和订阅服务，`Ribbon`作为负载均衡，`Hstix`作为失败容错，利用`RabbitMQ`作为消息队列作解耦；使用`MySQL`作为数据层的主数据库，使用`Redis`作为数据层的缓存使用，使用`FastDFS`作为图片文件存储系统。
 
   - 1.参与系统设计、数据库设计、核心功能模块开发、性能优化、浏览器兼容性处理等工作
   - 2.参与搭建
