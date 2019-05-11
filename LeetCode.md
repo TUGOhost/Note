@@ -2787,3 +2787,190 @@ class Solution {
 }
 ```
 
+## 138. 复制带随机指针的链表
+
+### 题目描述
+
+给定一个链表，每个节点包含一个额外增加的随机指针，该指针可以指向链表中的任何节点或空节点。
+
+要求返回这个链表的**深拷贝**。 
+
+ 
+
+**示例：**
+
+**![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2019/02/23/1470150906153-2yxeznm.png)**
+
+```
+输入：
+{"$id":"1","next":{"$id":"2","next":null,"random":{"$ref":"2"},"val":2},"random":{"$ref":"2"},"val":1}
+
+解释：
+节点 1 的值是 1，它的下一个指针和随机指针都指向节点 2 。
+节点 2 的值是 2，它的下一个指针指向 null，随机指针指向它自己。
+```
+
+ 
+
+**提示：**
+
+1. 你必须返回**给定头的拷贝**作为对克隆列表的引用。
+
+### 分析
+
+之前刷过剑指offer，有一题一样的，哈哈，然后用那题的思路，然后就通过了。
+1. 在旧链表中创建新链表，此时不处理新链表的兄弟节点
+2. 根据旧链表的兄弟节点，初始化新链表的兄弟节点
+3. 从旧链表中拆分得来新链表
+
+### 贴出代码
+
+```java
+/*
+// Definition for a Node.
+class Node {
+    public int val;
+    public Node next;
+    public Node random;
+
+    public Node() {}
+
+    public Node(int _val,Node _next,Node _random) {
+        val = _val;
+        next = _next;
+        random = _random;
+    }
+};
+*/
+class Solution {
+    public Node copyRandomList(Node head) {
+        if(head == null){
+            return null;
+        }
+        
+        Node currentNode = head;
+        
+        while(currentNode != null){
+            Node cloneNode = new Node(currentNode.val);
+            Node nextNode = currentNode.next;
+            currentNode.next = cloneNode;
+            cloneNode.next = nextNode;
+            currentNode = nextNode;
+        }
+        
+        currentNode = head;
+        while(currentNode != null){
+            currentNode.next.random = currentNode.random == null ? null : currentNode.random.next;
+            currentNode = currentNode.next.next;
+        }
+        currentNode = head;
+        Node pCloneNode = head.next;
+        while(currentNode != null){
+            Node cloneNode = currentNode.next;
+            currentNode.next = cloneNode.next;
+            cloneNode.next = cloneNode.next == null ? null : cloneNode.next.next;
+            currentNode = currentNode.next;
+        }
+        return pCloneNode;
+    }
+}
+```
+
+
+
+## 142. 环形链表 II
+
+### 题目描述
+
+给定一个链表，返回链表开始入环的第一个节点。 如果链表无环，则返回 `null`。
+
+为了表示给定链表中的环，我们使用整数 `pos` 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 `pos` 是 `-1`，则在该链表中没有环。
+
+**说明：**不允许修改给定的链表。
+
+ 
+
+**示例 1：**
+
+```
+输入：head = [3,2,0,-4], pos = 1
+输出：tail connects to node index 1
+解释：链表中有一个环，其尾部连接到第二个节点。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist.png)
+
+**示例 2：**
+
+```
+输入：head = [1,2], pos = 0
+输出：tail connects to node index 0
+解释：链表中有一个环，其尾部连接到第一个节点。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test2.png)
+
+**示例 3：**
+
+```
+输入：head = [1], pos = -1
+输出：no cycle
+解释：链表中没有环。
+```
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test3.png)
+
+ 
+
+**进阶：**
+ 你是否可以不用额外空间解决此题？
+
+### 分析
+
+快慢指针，判断是否有环，如果有环，则遍历出现第一次环在输出，否则输出null。
+
+### 贴出代码
+
+```java
+/**
+ * Definition for singly-linked list.
+ * class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        boolean hasCycle = false;
+        if(head == null || head.next == null){
+            return null;
+        }
+        
+        ListNode slow = head;
+        ListNode fast = head;
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+            if(slow == fast){
+                hasCycle = true;
+                break;
+            }
+        }
+        if(hasCycle){
+            ListNode q = head;
+            while(q != slow){
+                slow = slow.next;
+                q = q.next;
+            }
+            return q;
+        }else{
+            return null;
+        }
+    }
+}
+```
+

@@ -2379,7 +2379,7 @@ public class Solution {
             RandomListNode cloneNode = new RandomListNode(currentNode.label);
             RandomListNode nextNode = currentNode.next;
             currentNode.next = cloneNode;
-            cloneNode.next =nextNode;
+            cloneNode.next =nextNode;  
             currentNode = nextNode;
         }
 
