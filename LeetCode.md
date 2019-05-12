@@ -2974,3 +2974,209 @@ public class Solution {
 }
 ```
 
+## 148. 排序链表
+
+### 题目描述
+
+在 *O*(*n* log *n*) 时间复杂度和常数级空间复杂度下，对链表进行排序。
+
+**示例 1:**
+
+```
+输入: 4->2->1->3
+输出: 1->2->3->4
+```
+
+**示例 2:**
+
+```
+输入: -1->5->3->4->0
+输出: -1->0->3->4->5
+```
+
+### 分析
+
+要保证时间复杂度为 *O*(*n* log *n*) ，所以想到了归并排序和快排，但是这两个都是针对数组的，用链表来实现就有点难了。
+归并排序法：在动手之前一直觉得空间复杂度为常量不太可能，因为原来使用归并时，都是 O(N)的，需要复制出相等的空间来进行赋值归并。对于链表，实际上是可以实现常数空间占用的（链表的归并排序不需要额外的空间）。利用归并的思想，递归地将当前链表分为两段，然后merge，分两段的方法是使用 fast-slow 法，用两个指针，一个每次走两步，一个走一步，知道快的走到了末尾，然后慢的所在位置就是中间位置，这样就分成了两段。merge时，把两段头部节点值比较，用一个 p 指向较小的，且记录第一个节点，然后 两段的头一步一步向后走，p也一直向后走，总是指向较小节点，直至其中一个头为NULL，处理剩下的元素。最后返回记录的头即可。
+主要考察3个知识点，
+知识点1：归并排序的整体思想
+知识点2：找到一个链表的中间节点的方法
+知识点3：合并两个已排好序的链表为一个新的有序链表
+
+### 贴出代码
+```java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public ListNode sortList(ListNode head) {
+        return head == null ? null : mergeSort(head);
+    }
+    
+    private ListNode mergeSort(ListNode head){
+        if(head.next == null){
+            return head;
+        }
+        ListNode p = head, q = head, pre = null;
+        while(q != null && q.next != null){
+            pre = p;
+            p = p.next;
+            q = q.next.next;
+        }
+        pre.next = null;
+        ListNode l = mergeSort(head);
+        ListNode r = mergeSort(p);
+        return merge(l,r);
+    }
+    
+    private ListNode merge(ListNode l, ListNode r){
+        ListNode dummy = new ListNode(0);
+        ListNode curr = dummy;
+        while(l != null && r != null){
+            if(l.val <= r.val){
+                curr.next = l;
+                curr = curr.next;
+                l = l.next;
+            }else{
+                curr.next = r;
+                curr = curr.next;
+                r = r.next;
+            }
+        }
+        if(l != null){
+            curr.next = l;
+        }
+        if(r != null){
+            curr.next = r;
+        }
+        return dummy.next;
+    }
+}
+```
+
+
+## 146. LRU缓存机制
+
+### 题目描述
+
+运用你所掌握的数据结构，设计和实现一个  [LRU (最近最少使用) 缓存机制](https://baike.baidu.com/item/LRU)。它应该支持以下操作： 获取数据 `get` 和 写入数据 `put` 。
+
+获取数据 `get(key)` - 如果密钥 (key) 存在于缓存中，则获取密钥的值（总是正数），否则返回 -1。
+ 写入数据 `put(key, value)` - 如果密钥不存在，则写入其数据值。当缓存容量达到上限时，它应该在写入新数据之前删除最近最少使用的数据值，从而为新的数据值留出空间。
+
+**进阶:**
+
+你是否可以在 **O(1)** 时间复杂度内完成这两种操作？
+
+**示例:**
+
+```
+LRUCache cache = new LRUCache( 2 /* 缓存容量 */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // 返回  1
+cache.put(3, 3);    // 该操作会使得密钥 2 作废
+cache.get(2);       // 返回 -1 (未找到)
+cache.put(4, 4);    // 该操作会使得密钥 1 作废
+cache.get(1);       // 返回 -1 (未找到)
+cache.get(3);       // 返回  3
+cache.get(4);       // 返回  4
+```
+
+### 分析
+
+https://www.acwing.com/solution/LeetCode/content/236/
+
+### 贴出代码
+```java
+class LRUCache {
+    
+    private class Node{
+        private int key;
+        private int value;
+        private Node pre;
+        private Node next;
+
+        public Node(int key, int val){
+            this.key = key;
+            this.value = val;
+            this.next = null;
+        }
+    }
+
+    private Node head;
+    private Node tail;
+    private int size;
+    private int capacity;
+    private Map<Integer,Node> map;
+    
+    public LRUCache(int capacity) {
+        head = null;
+        tail = null;
+        this.capacity = capacity;
+        map = new HashMap<>((int) (capacity / 0.75) + 1);
+    }
+
+    public int get(int key) {
+        Node ret = map.get(key);
+        if (ret != null){
+            levelUp(ret);
+            return ret.value;
+        }
+        return -1;
+    }
+    
+    private void levelUp(Node node){
+        if (head != node){
+            Node pre = node.pre;
+            Node next = node.next;
+            pre.next = next;
+            if (tail == node){
+                tail = pre;
+            }else {
+                next.pre = pre;
+            }
+            head.pre = node;
+            node.next = head;
+            node.pre = null;
+            head = node;
+        }
+    }
+
+    public void put(int key, int value) {
+        Node target = map.get(key);
+        if (target != null){
+            target.value = value;
+            levelUp(target);
+        }else {
+            if (size == capacity){
+                Node delNode = tail;
+                tail = delNode.pre;
+                if (tail != null){
+                    tail.next = null;
+                }
+                delNode.pre = null;
+                map.remove(delNode.key);
+            }else {
+                size++;
+            }
+            Node node = new Node(key, value);
+            if (head == null || tail == null){
+                head = node;
+                tail = node;
+            }else {
+                head.pre = node;
+                node.next = head;
+                head = node;
+            }
+            map.put(key,node);
+        }
+    }
+}
+```
