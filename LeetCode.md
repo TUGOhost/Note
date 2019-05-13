@@ -3180,3 +3180,111 @@ class LRUCache {
     }
 }
 ```
+
+## 17. 电话号码的字母组合
+
+### 题目描述
+
+给定一个仅包含数字 `2-9` 的字符串，返回所有它能表示的字母组合。
+
+给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+
+![img](http://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Telephone-keypad2.svg/200px-Telephone-keypad2.svg.png)
+
+**示例:**
+
+```
+输入："23"
+输出：["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"].
+```
+
+**说明:**
+ 尽管上面的答案是按字典序排列的，但是你可以任意选择答案输出的顺序。
+
+### 分析
+
+DFS + 回溯的思路，穷举出所有可能，并加入list中。
+执行用时 : 1 ms, 在Letter Combinations of a Phone Number的Java提交中击败了99.94% 的用户
+内存消耗 : 35.2 MB, 在Letter Combinations of a Phone Number的Java提交中击败了86.40% 的用户
+
+### 贴出代码
+```java
+class Solution {
+    private String[] arr = new String[]{"0","1","abc","def","ghi","jkl","mno","pqrs","tuv","wxyz"};
+    public List<String> letterCombinations(String digits) {
+        List<String> list = new ArrayList<>();
+        if(digits != null  && digits.length() > 0){
+            dfs(list, digits,0,"");
+        }
+        return list;
+    }
+    
+    public void dfs(List<String> list,String digits, int d, String str){
+        if(d == digits.length()){
+            list.add(str);
+            return;
+        }
+        for(int i = 0 ; i < arr[digits.charAt(d) - '0'].length(); i ++){
+            dfs(list,digits,d + 1,str + arr[digits.charAt(d) - '0'].charAt(i));
+        }
+    }
+}
+```
+
+
+## 46. 全排列
+
+### 题目描述
+
+给定一个**没有重复**数字的序列，返回其所有可能的全排列。
+
+**示例:**
+
+```
+输入: [1,2,3]
+输出:
+[
+  [1,2,3],
+  [1,3,2],
+  [2,1,3],
+  [2,3,1],
+  [3,1,2],
+  [3,2,1]
+]
+```
+
+### 分析
+
+我们从前往后，一位一位枚举，每次选择一个没有被使用过的数。
+选好之后，将该数的状态改成“已被使用”，同时将该数记录在相应位置上，然后递归。
+递归返回时，不要忘记将该数的状态改成“未被使用”，并将该数从相应位置上删除。
+
+### 贴出代码
+
+```java
+class Solution {
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        boolean[] flag = new boolean[nums.length];
+        List<Integer> list = new ArrayList<>();
+        dfs(ans, list, nums, flag, 0);
+        return ans;
+    }
+
+    private void dfs(List<List<Integer>> ans, List<Integer> list, int[] nums, boolean[] flag, int num) {
+        if (num == nums.length){
+            ans.add(new ArrayList<>(list));
+            return;
+        }
+        for (int i = 0; i < flag.length; i++ ){
+            if (flag[i] == false){
+                flag[i] = true;
+                list.add(nums[i]);
+                dfs(ans,list,nums,flag,num + 1);
+                list.remove(list.size() - 1);
+                flag[i] = false;
+            }
+        }
+    }
+}
+```
