@@ -3288,3 +3288,137 @@ class Solution {
     }
 }
 ```
+
+## 47. 全排列 II
+
+### 题目描述
+
+给定一个可包含重复数字的序列，返回所有不重复的全排列。
+
+**示例:**
+
+```
+输入: [1,1,2]
+输出:
+[
+  [1,1,2],
+  [1,2,1],
+  [2,1,1]
+]
+```
+
+### 分析
+
+1. 先将所有数从小到大排序，这样相同的数会排在一起；
+2. 从左到右依次枚举每个数，每次将它放在一个空位上；
+3. 对于相同数，我们人为定序，就可以避免重复计算：我们在dfs时记录一个额外的状态，记录上一个相同数存放的位置 start，我们在枚举当前数时，只枚举 start+1,start+2,…,n这些位置。
+3. 不要忘记递归前和回溯时，对状态进行更新。
+
+### 贴出代码
+```java
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        ArrayList<Integer> list = new ArrayList<>();
+        Arrays.sort(nums);
+        dfs(list, nums,new boolean[nums.length]);
+        return res;
+    }
+
+    private void dfs(ArrayList<Integer> list, int[] nums, boolean[] visit) {
+        if (nums.length == list.size()){
+            res.add(new ArrayList<>(list));
+            return;
+        }
+        for (int i = 0; i < nums.length; i ++){
+            if (visit[i])
+                continue;
+            if (i > 0 && nums[i - 1] == nums[i] && !visit[i - 1])
+                continue;
+            list.add(nums[i]);
+            visit[i] = true;
+            dfs(list,nums,visit);
+            visit[i] = false;
+            list.remove(list.size() -1);
+        }
+    }
+}
+```
+
+## 90. 子集 II
+
+### 题目描述
+
+给定一个可能包含重复元素的整数数组 ***nums***，返回该数组所有可能的子集（幂集）。
+
+**说明：**解集不能包含重复的子集。
+
+**示例:**
+
+```
+输入: [1,2,2]
+输出:
+[
+  [2],
+  [1],
+  [1,2,2],
+  [2,2],
+  [1,2],
+  []
+]
+```
+
+
+
+### 分析
+
+
+
+### 贴出代码
+
+
+
+## 39. 组合总和
+
+### 题目描述
+
+给定一个**无重复元素**的数组 `candidates` 和一个目标数 `target` ，找出 `candidates` 中所有可以使数字和为 `target` 的组合。
+
+`candidates` 中的数字可以无限制重复被选取。
+
+**说明：**
+
+- 所有数字（包括 `target`）都是正整数。
+- 解集不能包含重复的组合。 
+
+**示例 1:**
+
+```
+输入: candidates = [2,3,6,7], target = 7,
+所求解集为:
+[
+  [7],
+  [2,2,3]
+]
+```
+
+**示例 2:**
+
+```
+输入: candidates = [2,3,5], target = 8,
+所求解集为:
+[
+  [2,2,2,2],
+  [2,3,3],
+  [3,5]
+]
+```
+
+
+
+### 分析
+
+
+
+### 贴出代码
+
