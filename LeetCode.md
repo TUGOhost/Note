@@ -3372,10 +3372,48 @@ class Solution {
 
 ### 分析
 
+为了方便处理，我们先将数组排序，这样相同元素就会排在一起。
 
+然后暴力搜索所有方案，搜索顺序是这样的：
+我们先枚举每个不同的数，枚举到数 x
+时，我们再求出 x 的个数 k，然后我们枚举在集合中放入 0,1,2,…k 个 x，共 k+1 种情况。
+当枚举完最后一个数时，表示我们已经选定了一个集合，将该集合加入答案中即可。
 
 ### 贴出代码
+```java
+class Solution {
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        Arrays.sort(nums);
+        List<List<Integer>> res = new ArrayList<>();
+        List<Integer> item = new ArrayList<>();
+        dfs(res,item,0,nums);
+        return res;
+    }
 
+    private void dfs(List<List<Integer>> ans,List<Integer> item,int num,int[] nums){
+        if (num == nums.length){
+            ans.add(new ArrayList<>(item));
+            return;
+        }
+        int count = 1;
+        for(int i = num + 1; i < nums.length; i ++){
+            if (nums[i] == nums[num]){
+                count ++;
+            }else{
+                break;
+            }
+        }
+        dfs(ans,item,num + count, nums);
+        for (int i = 0; i < count ; i ++){
+            item.add(nums[num]);
+            dfs(ans,item,num + count, nums);
+        }
+        for (int i = 0; i < count ; i ++){
+            item.remove(item.size() - 1);
+        }
+    }
+}
+```
 
 
 ## 39. 组合总和
@@ -3421,4 +3459,28 @@ class Solution {
 
 
 ### 贴出代码
+```java
+class Solution {
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> res = new ArrayList<>();
+        Arrays.sort(candidates);
+        dfs(candidates,target,res,new ArrayList<>(),0);
+        return res;
+    }
 
+    private void dfs(int[] nums, int remain, List<List<Integer>> res, ArrayList<Integer> sb, int start){
+        if(remain < 0){
+            return;
+        }
+        else if (remain == 0){
+            res.add(new ArrayList<>(sb));
+        }else{
+            for(int i = start; i < nums.length; i ++){
+                sb.add(nums[i]);
+                dfs(nums,remain - nums[i],res,sb, i);
+                sb.remove(sb.size() -1);
+            }
+        }
+    }
+}
+```

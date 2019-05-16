@@ -340,3 +340,116 @@ public class HelloController {
 -service-hi工程跑了两个实例，端口分别为8762,8763，分别向服务注册中心注册
 - sercvice-ribbon端口为8764,向服务注册中心注册
 - 当sercvice-ribbon通过restTemplate调用service-hi的hi接口时，因为用ribbon进行了负载均衡，会轮流的调用service-hi：8762和8763 两个端口的hi接口；
+
+# 服务消费者（Feign）(Finchley版本)
+上一篇文章，讲述了如何通过RestTemplate+Ribbon去消费服务，这篇文章主要讲述如何通过Feign去消费服务。
+## Feign简介
+Feign是一个声明式的伪Http客户端，它使得写Http客户端变得更简单。使用Feign，只需要创建一个接口并注解。它具有可插拔的注解特性，可使用Feign 注解和JAX-RS注解。Feign支持可插拔的编码器和解码器。Feign默认集成了Ribbon，并和Eureka结合，默认实现了负载均衡的效果。
+简而言之：
+- Feign 采用的是基于接口的注解
+- Feign 整合了ribbon，具有负载均衡的能力
+- 整合了Hystrix，具有熔断的能力
+
+## 准备工作
+继续用上一节的工程， 启动eureka-server，端口为8761; 启动service-hi 两次，端口分别为8762 、8773.
+### 创建一个feign的服务
+新建一个spring-boot工程，取名为service-feign，在它的pom文件引入Feign的起步依赖spring-cloud-starter-feign、Eureka的起步依赖spring-cloud-starter-netflix-eureka-client、Web的起步依赖spring-boot-starter-web，代码如下：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>sc-f-chapter3</artifactId>
+        <groupId>com.tugohost</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tugohost</groupId>
+    <artifactId>service-feign</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-netflix-eureka-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+    </dependencies>
+
+
+</project>
+```
+目录结构；
+![](image/347.png)
+在工程的配置文件`application.yml`文件，指定程序名为service-feign，端口号为8765，服务注册地址为http://localhost:8761/eureka/ ，代码如下：
+```yml
+eureka:
+  client:
+    service-url: http://localhost:8761/eureka/
+server:
+  port: 8765
+spring:
+  application:
+    name: service-feign
+
+```
+
+在程序的启动类`ServiceFeignApplication`，加上@EnableFeignClients注解开启Feign的功能：
+```java
+/**
+ * @author: Tu9ohost
+ */
+@SpringBootApplication
+@EnableEurekaClient
+@EnableDiscoveryClient
+@EnableFeignClients
+public class ServiceFeignApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ServiceFeignApplication.class,args);
+    }
+}
+```
+service层定义一个feign接口，通过@ FeignClient（“服务名”），来指定调用哪个服务。比如在代码中调用了service-hi服务的“/hi”接口，代码如下：
+```java
+/**
+ * @author: Tu9ohost
+ */
+@FeignClient(value = "service-hi")
+public interface SchedualServiceHi {
+    @RequestMapping(value = "/hi",method = RequestMethod.GET)
+    String sayHiFromClientOne(@RequestParam(value = "name") String name);
+}
+```
+
+在Web层的controller层，对外暴露一个"/hi"的API接口，通过上面定义的Feign客户端SchedualServiceHi 来消费服务。代码如下：
+```java
+/**
+ * @author: Tu9ohost
+ */
+@RestController
+public class HiController {
+    @Autowired
+    SchedualServiceHi schedualServiceHi;
+
+    @GetMapping(value = "/hi")
+    public String sayHi(@RequestParam String name){
+        return schedualServiceHi.sayHiFromClientOne(name);
+    }
+}
+```
+
+启动程序，多次访问http://localhost:8765/hi?name=tugohost,浏览器交替显示：
+>     
+    hi tugohost,i am from port:8762
+    hi tugohost,i am from port:8763
+
+# 断路器（Hystrix）(Finchley版本)
