@@ -557,3 +557,344 @@ public class SchedualServiceHiHystric implements SchedualServiceHi{
 > hi tugohost,i am from port:8762
 
 这证明断路器起到作用了。
+
+# 路由网关(zuul)(Finchley版本)
+在微服务架构中，需要几个基础的服务治理组件，包括服务注册与发现、服务消费、负载均衡、断路器、智能路由、配置管理等，由这几个基础组件相互协作，共同组建了一个简单的微服务系统。一个简单的微服务系统如下图：
+![](image/349.png)
+Cloud微服务系统中，一种常见的负载均衡方式是，客户端的请求首先经过负载均衡（zuul、Ngnix），再到达服务网关（zuul集群），然后再到具体的服。，服务统一注册到高可用的服务注册中心集群，服务的所有的配置文件由配置服务管理（下一篇文章讲述），配置服务的配置文件放在git仓库，方便开发人员随时改配置。
+## Zuul介绍
+Zuul的主要功能是路由转发和过滤器。路由功能是微服务的一部分，比如／api/user转发到到user服务，/api/shop转发到到shop服务。zuul默认和Ribbon结合实现了负载均衡的功能。
+zuul有以下功能：
+
+- Authentication
+- Insights
+- Stress Testing
+- Canary Testing
+- Dynamic Routing
+- Service Migration
+- Load Shedding
+- Security
+- Static Response handling
+- Active/Active traffic management
+
+## 准备工作
+继续使用[上一节](https://www.cnblogs.com/Tu9oh0st/p/10878873.html)的工程。在原有的工程上，创建一个新的工程。
+## 创建service-zuul工程
+其pom.xml文件如下：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>sc-f-chapter1</artifactId>
+        <groupId>com.tugohost</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tugohost</groupId>
+    <artifactId>service-zuul</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-zuul</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
+```
+
+在其入口applicaton类加上注解@EnableZuulProxy，开启zuul的功能：
+```java
+/**
+ * @author: Tu9ohost
+ */
+@SpringBootApplication
+@EnableZuulProxy
+@EnableEurekaClient
+@EnableDiscoveryClient
+public class ServiceZuulApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ServiceZuulApplication.class,args);
+    }
+}
+```
+加上配置文件application.yml加上以下的配置代码：
+```yml
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+server:
+  port: 8769
+spring:
+  application:
+    name: service-zuul
+zuul:
+  routes:
+    api-a:
+      path: /api-a/**
+      serviceId: service-ribbon
+    api-b:
+      path: /api-b/**
+      serviceId: service-feign
+```
+首先指定服务注册中心的地址为http://localhost:8761/eureka/，服务的端口为8769，服务名为service-zuul；以/api-a/ 开头的请求都转发给service-ribbon服务；以/api-b/开头的请求都转发给service-feign服务；
+
+依次运行这五个工程;打开浏览器访问：http://localhost:8769/api-a/hi?name=tugohost ;浏览器显示：
+
+> hi tugohost,i am from port:8762
+
+打开浏览器访问：http://localhost:8769/api-b/hi?name=forezp ;浏览器显示：
+
+> hi tugohost,i am from port:8762
+
+这说明zuul起到了路由的作用
+## 服务过滤
+zuul不仅只是路由，并且还能过滤，做一些安全验证。继续改造工程；
+```java
+/**
+ * @author: Tu9ohost
+ */
+@Component
+public class MyFilter extends ZuulFilter {
+    private static Logger log = LoggerFactory.getLogger(MyFilter.class);
+
+    @Override
+    public String filterType() {
+        return "pre";
+    }
+
+    @Override
+    public int filterOrder() {
+        return 0;
+    }
+
+    @Override
+    public boolean shouldFilter() {
+        return true;
+    }
+
+    @Override
+    public Object run() throws ZuulException {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
+        log.info(String.format("%s >>> %s",request.getMethod(),request.getRequestURI().toString()));
+        Object accessToken = request.getParameter("token");
+        if (accessToken == null){
+            log.warn("token is empty");
+            ctx.setSendZuulResponse(false);
+            ctx.setResponseStatusCode(401);
+            try {
+                ctx.getResponse().getWriter().write("token is empty");
+            }catch (Exception e){
+
+            }
+            return null;
+        }
+        log.info("ok");
+        return null;
+    }
+}
+```
+- filterType：返回一个字符串代表过滤器的类型，在zuul中定义了四种不同生命周期的过滤器类型，具体如下： 
+    - pre：路由之前
+    - routing：路由之时
+    - post： 路由之后
+    - error：发送错误调用
+- filterOrder：过滤的顺序
+- shouldFilter：这里可以写逻辑判断，是否要过滤，本文true,永远过滤。
+- run：过滤器的具体逻辑。可用很复杂，包括查sql，nosql去判断该请求到底有没有权限访问。
+
+这时访问：http://localhost:8769/api-a/hi?name=tugohost ；网页显示：
+
+> token is empty
+
+访问 http://localhost:8769/api-a/hi?name=tugohost&token=22 ； 网页显示：
+
+> hi tugohost,i am from port:8762
+
+# 分布式配置中心(Spring Cloud Config)(Finchley版本)
+在[上一篇文章](https://www.cnblogs.com/Tu9oh0st/p/10887379.html)讲述zuul的时候，已经提到过，使用配置服务来保存各个服务的配置文件。它就是Spring Cloud Config。
+## 简介
+在分布式系统中，由于服务数量巨多，为了方便服务配置文件统一管理，实时更新，所以需要分布式配置中心组件。在Spring Cloud中，有分布式配置中心组件spring cloud config ，它支持配置服务放在配置服务的内存中（即本地），也支持放在远程Git仓库中。在spring cloud config 组件中，分两个角色，一是config server，二是config client。 
+## 构建Config Server
+创建一个spring-boot项目，取名为config-server,其pom.xml如下：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>sc-f-chapter1</artifactId>
+        <groupId>com.tugohost</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tugohost</groupId>
+    <artifactId>config-server</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+
+在程序的入口Application类加上@EnableConfigServer注解开启配置服务器的功能，代码如下：
+```java
+/**
+ * @author: Tu9ohost
+ */
+@SpringBootApplication
+@EnableConfigServer
+public class ConfigServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ConcurrentHashMap.class,args);
+    }
+}
+```
+需要在程序的配置文件application.properties文件配置以下：
+```properties
+spring.application.name=config-server
+server.port=8888
+
+spring.cloud.config.server.git.uri=https://github.com/forezp/SpringcloudConfig/
+spring.cloud.config.server.git.searchPaths=respo
+spring.cloud.config.label=master
+spring.cloud.config.server.git.username=
+spring.cloud.config.server.git.password=
+```
+- spring.cloud.config.server.git.uri：配置git仓库地址
+- spring.cloud.config.server.git.searchPaths：配置仓库路径
+- spring.cloud.config.label：配置仓库的分支
+- spring.cloud.config.server.git.username：访问git仓库的用户名
+- spring.cloud.config.server.git.password：访问git仓库的用户密码
+如果Git仓库为公开仓库，可以不填写用户名和密码，如果是私有仓库需要填写，本例子是公开仓库，放心使用。
+远程仓库https://github.com/forezp/SpringcloudConfig/ 中有个文件config-client-dev.properties文件中有一个属性：
+> foo = foo version 3
+启动程序：访问http://localhost:8888/foo/dev
+```
+{"name":"foo","profiles":["dev"],"label":"master",
+"version":"792ffc77c03f4b138d28e89b576900ac5e01a44b","state":null,"propertySources":[]}
+```
+
+证明配置服务中心可以从远程程序获取配置信息。
+http请求地址和资源文件映射如下:
+
+- /{application}/{profile}[/{label}]
+- /{application}-{profile}.yml
+- /{label}/{application}-{profile}.yml
+- /{application}-{profile}.properties
+- /{label}/{application}-{profile}.properties
+
+## 构建一个config client
+重新创建一个springboot项目，取名为config-client,其pom文件：
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>sc-f-chapter1</artifactId>
+        <groupId>com.tugohost</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tugohost</groupId>
+    <artifactId>config-client</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>config-client</name>
+
+
+    <dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+```
+其配置文件bootstrap.properties：
+```properties
+spring.application.name=config-client
+spring.cloud.config.label=master
+spring.cloud.config.profile=dev
+spring.cloud.config.uri= http://localhost:8888/
+server.port=8881
+```
+- spring.cloud.config.label 指明远程仓库的分支
+- spring.cloud.config.profile 
+    - dev开发环境配置文件
+    - test测试环境
+    - pro正式环境
+- spring.cloud.config.uri= http://localhost:8888/ 指明配置服务中心的网址。
+程序的入口类，写一个API接口“／hi”，返回从配置中心读取的foo变量的值，代码如下：
+```java
+@SpringBootApplication
+@RestController
+public class ConfigClientApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ConfigClientApplication.class, args);
+	}
+
+	@Value("${foo}")
+	String foo;
+	@RequestMapping(value = "/hi")
+	public String hi(){
+		return foo;
+	}
+}
+```
+打开网址访问：http://localhost:8881/hi，网页显示：
+> foo version 3
+这就说明，config-client从config-server获取了foo的属性，而config-server是从git仓库读取的
