@@ -898,3 +898,153 @@ public class ConfigClientApplication {
 打开网址访问：http://localhost:8881/hi，网页显示：
 > foo version 3
 这就说明，config-client从config-server获取了foo的属性，而config-server是从git仓库读取的
+
+# 高可用的分布式配置中心(Spring Cloud Config)(Finchley版本)
+[上一篇文章](https://www.cnblogs.com/Tu9oh0st/p/10887633.html)讲述了一个服务如何从配置中心读取文件，配置中心如何从远程git读取配置文件，当服务实例很多时，都从配置中心读取文件，这时可以考虑将配置中心做成一个微服务，将其集群化，从而达到高可用
+
+## 准备工作
+创建一个eureka-server工程，用作服务注册中心。
+在其pom.xml文件引入Eureka的起步依赖spring-cloud-starter-netflix- eureka-server，代码如下:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>sc-f-chapter6</artifactId>
+        <groupId>com.tugohost</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tugohost</groupId>
+    <artifactId>eureka-server</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+```
+在配置文件application.yml上，指定服务端口为8889，加上作为服务注册中心的基本配置，代码如下：
+```yml
+server:
+  port: 8889
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+```
+入口类：
+```java
+/**
+ * @author: Tu9ohost
+ */
+@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class,args);
+    }
+}
+```
+## 改造config-server
+在其pom.xml文件加上EurekaClient的起步依赖spring-cloud-starter-netflix-eureka-client，代码如下:
+```xml
+<dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+
+    </dependencies>
+```
+配置文件application.yml，指定服务注册地址为http://localhost:8889/eureka/，其他配置同上一篇文章，完整的配置如下：
+```yml
+spring.application.name=config-server
+server.port=8888
+
+spring.cloud.config.server.git.uri=https://github.com/forezp/SpringcloudConfig/
+spring.cloud.config.server.git.searchPaths=respo
+spring.cloud.config.label=master
+spring.cloud.config.server.git.username=
+spring.cloud.config.server.git.password=
+eureka.client.serviceUrl.defaultZone=http://localhost:8889/eureka/
+```
+最后需要在程序的启动类Application加上@EnableEureka的注解。
+## 改造config-client
+将其注册微到服务注册中心，作为Eureka客户端，需要pom文件加上起步依赖spring-cloud-starter-netflix-eureka-client，代码如下：
+```xml
+<dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+    </dependencies>
+```
+配置文件bootstrap.properties，注意是bootstrap。加上服务注册地址为http://localhost:8889/eureka/
+```properties
+spring.application.name=config-client
+spring.cloud.config.label=master
+spring.cloud.config.profile=dev
+#spring.cloud.config.uri= http://localhost:8888/
+
+eureka.client.serviceUrl.defaultZone=http://localhost:8889/eureka/
+spring.cloud.config.discovery.enabled=true
+spring.cloud.config.discovery.serviceId=config-server
+server.port=8881
+```
+
+- spring.cloud.config.discovery.enabled 是从配置中心读取文件。
+- spring.cloud.config.discovery.serviceId 配置中心的servieId，即服务名。
+这时发现，在读取配置文件不再写ip地址，而是服务名，这时如果配置服务部署多份，通过负载均衡，从而高可用。
+
+依次启动eureka-servr,config-server,config-client 访问网址：http://localhost:8889/
+访问http://localhost:8881/hi，浏览器显示：
+
+> foo version 3
