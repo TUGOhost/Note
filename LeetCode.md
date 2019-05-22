@@ -1,5 +1,3 @@
-##  最大子序和
-
 ### 题目描述
 
 给定一个整数数组 nums ，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
@@ -3926,4 +3924,497 @@ class Solution {
 ### 贴出代码
 ```java
 
+```
+
+## 101. 对称二叉树
+
+### 题目描述
+
+给定一个二叉树，检查它是否是镜像对称的。
+
+例如，二叉树 `[1,2,2,3,4,4,3]` 是对称的。
+
+```
+    1
+   / \
+  2   2
+ / \ / \
+3  4 4  3
+```
+
+但是下面这个 `[1,2,2,null,3,null,3]` 则不是镜像对称的:
+
+```
+    1
+   / \
+  2   2
+   \   \
+   3    3
+```
+
+**说明:**
+
+如果你可以运用递归和迭代两种方法解决这个问题，会很加分。
+
+### 分析
+
+(递归) O(n)
+
+递归判断两个子树是否互为镜像。
+
+两个子树互为镜像当且仅当：
+
+1. 两个子树的根节点值相等；
+2. 第一棵子树的左子树和第二棵子树的右子树互为镜像，且第一棵子树的右子树和第二棵子树的左子树互为镜像；
+
+时间复杂度分析：从上到下每个节点仅被遍历一遍，所以时间复杂度是 O(n)。
+
+### 贴出代码
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        return root == null || dfs(root.left,root.right);
+    }
+
+    private boolean dfs(TreeNode p, TreeNode q){
+        if (p == null || q == null){
+            return p == null && q == null;
+        }
+        return p.val == q.val && dfs(p.left,q.right) && dfs(p.right,q.left);
+    }
+}
+```
+
+
+
+## 104. 二叉树的最大深度
+
+### 题目描述
+
+给定一个二叉树，找出其最大深度。
+
+二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+
+**说明:** 叶子节点是指没有子节点的节点。
+
+**示例：**
+ 给定二叉树 `[3,9,20,null,null,15,7]`，
+
+```
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+返回它的最大深度 3 。
+
+### 分析
+
+递归求解：
+当前树的最大深度等于左右子树的最大深度加1。
+
+时间复杂度分析：树中每个节点只被遍历一次，所以时间复杂度是 O(n)。
+
+### 贴出代码
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public int maxDepth(TreeNode root) {
+        return root != null ? Math.max(maxDepth(root.left), maxDepth(root.right)) + 1: 0;
+    }
+}
+```
+
+## 145. 二叉树的后序遍历
+
+### 题目描述
+
+给定一个二叉树，返回它的 *后序* 遍历。
+
+**示例:**
+
+```
+输入: [1,null,2,3]  
+   1
+    \
+     2
+    /
+   3 
+
+输出: [3,2,1]
+```
+
+**进阶:** 递归算法很简单，你可以通过迭代算法完成吗？
+
+### 分析
+
+后序遍历顺序是 left->right->root
+
+### 贴出代码
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    // 迭代版
+    public List<Integer> postorderTraversal(TreeNode root) {
+        List<Integer> res = new ArrayList<>();
+        LinkedList<TreeNode> s = new LinkedList<>();
+        TreeNode current = root, isVisited = null;
+        while (current != null || !s.isEmpty()){
+            while (current != null){
+                s.push(current);
+                current = current.left;
+            }
+            current = s.peek();
+            if (current.right == null || current.right == isVisited){
+                s.pop();
+                res.add(current.val);
+                isVisited = current;
+                current = null;
+            }else {
+                current = current.right;
+            }
+        }
+        return res;
+    }
+}
+```
+
+
+
+## 105. 从前序与中序遍历序列构造二叉树
+
+### 题目描述
+
+根据一棵树的前序遍历与中序遍历构造二叉树。
+
+**注意:**
+ 你可以假设树中没有重复的元素。
+
+例如，给出
+
+```
+前序遍历 preorder = [3,9,20,15,7]
+中序遍历 inorder = [9,3,15,20,7]
+```
+
+返回如下的二叉树：
+
+```
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+### 分析
+
+这题[剑指offer](https://www.cnblogs.com/Tu9oh0st/p/10730433.html)中出现过，虽然通过了，但是提交到leetcode上就特别差:
+> 56 ms	75.9 MB
+
+又看了别人的思路：
+(递归) O(n)
+
+递归建立整棵二叉树：先递归创建左右子树，然后创建根节点，并让指针指向两棵子树。
+
+具体步骤如下：
+
+1. 先利用前序遍历找根节点：前序遍历的第一个数，就是根节点的值；
+2. 在中序遍历中找到根节点的位置 k，则 k左边是左子树的中序遍历，右边是右子树的中序遍历；
+3. 假设左子树的中序遍历的长度是 l，则在前序遍历中，根节点后面的 l个数，是左子树的前序遍历，剩下的数是右子树的前序遍历；
+4. 有了左右子树的前序遍历和中序遍历，我们可以先递归创建出左右子树，然后再创建根节点；
+
+时间复杂度分析：我们在初始化时，用哈希表(unordered_map<int,int>)记录每个值在中序遍历中的位置，这样我们在递归到每个节点时，在中序遍历中查找根节点位置的操作，只需要 O(1)
+的时间。此时，创建每个节点需要的时间是 O(1)，所以总时间复杂度是 O(n)。
+
+> 8 ms	37.8 MB
+### 贴出代码
+
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        int[] curr = {0};
+
+        TreeNode root;
+        Map<Integer, Integer> inMap = new HashMap<>();
+
+        for (int i = 0 ;i < inorder.length; i ++){
+            inMap.put(inorder[i],i);
+        }
+
+        root = dfs(preorder,curr,0,preorder.length - 1,inMap);
+        return root;
+    }
+
+    private TreeNode dfs(int[] pre, int[] curr, int low, int high, Map<Integer,Integer> inMap){
+        if (curr[0] >= pre.length)
+            return null;
+        TreeNode root = new TreeNode(pre[curr[0]]);
+        if (low > high){
+            return null;
+        }else {
+            curr[0] += 1;
+            int i = inMap.get(root.val);
+            root.left = dfs(pre,curr,low,i - 1,inMap);
+            root.right = dfs(pre,curr,i + 1,high,inMap);
+        }
+        return root;
+    }
+}
+```
+
+## 331. 验证二叉树的前序序列化
+
+### 题目描述
+
+序列化二叉树的一种方法是使用前序遍历。当我们遇到一个非空节点时，我们可以记录下这个节点的值。如果它是一个空节点，我们可以使用一个标记值记录，例如 `#`。
+
+```
+     _9_
+    /   \
+   3     2
+  / \   / \
+ 4   1  #  6
+/ \ / \   / \
+# # # #   # #
+```
+
+例如，上面的二叉树可以被序列化为字符串 `"9,3,4,#,#,1,#,#,2,#,6,#,#"`，其中 `#` 代表一个空节点。
+
+给定一串以逗号分隔的序列，验证它是否是正确的二叉树的前序序列化。编写一个在不重构树的条件下的可行算法。
+
+每个以逗号分隔的字符或为一个整数或为一个表示 `null` 指针的 `'#'` 。
+
+你可以认为输入格式总是有效的，例如它永远不会包含两个连续的逗号，比如 `"1,,3"` 。
+
+**示例 1:**
+
+```
+输入: "9,3,4,#,#,1,#,#,2,#,6,#,#"
+输出: true
+```
+
+**示例 2:**
+
+```
+输入: "1,#"
+输出: false
+```
+
+**示例 3:**
+
+```
+输入: "9,#,#,1"
+输出: false
+```
+
+### 分析
+
+一般来说，只给出前序遍历，并不能唯一确定一棵二叉树。但这道题目中还给出了所有空节点的位置，所以可以唯一确定一棵二叉树。
+
+我们用先根顺序递归遍历整棵树，遍历时用一个指针在给定数组中指向当前节点的值，如果遇到#，则说明遇到了空节点，直接return；如果遇到整数，说明遍历到了树中的一个节点，我们先将指针后移，表示先输出根节点，然后依次递归遍历左子树和右子树。如果递归还没结束但数组已经遍历完，或者递归结束但数组还没遍历完，则说明给定的序列不是一个合法的前序遍历。
+
+时间复杂度分析：递归遍历时只将数组扫描了一遍，所以时间复杂度是 O(n)。
+
+### 贴出代码
+
+```java
+class Solution {
+    public boolean isValidSerialization(String preorder) {
+        int capacity = 1;
+        preorder += ',';
+        for (int i = 0; i < preorder.length(); i ++){
+            if (preorder.charAt(i) != ',')
+                continue;
+            if (--capacity < 0)
+                return false;
+            if (preorder.charAt(i - 1) != '#')
+                capacity += 2;
+        }
+        return capacity == 0;
+    }
+}
+```
+
+## 102. 二叉树的层次遍历
+
+### 题目描述
+
+给定一个二叉树，返回其按层次遍历的节点值。 （即逐层地，从左到右访问所有节点）。
+
+例如:
+ 给定二叉树: `[3,9,20,null,null,15,7]`,
+
+```
+    3
+   / \
+  9  20
+    /  \
+   15   7
+```
+
+返回其层次遍历结果：
+
+```
+[
+  [3],
+  [9,20],
+  [15,7]
+]
+```
+
+### 分析
+层次遍历的代码比较简单，只需要一个队列即可，先在队列中加入根结点。之后对于任意一个结点来说，在其出队列的时候，访问之。同时如果左孩子和右孩子有不为空的，入队列。
+### 贴出代码
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+     List<List<Integer>> res = new ArrayList<>();
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        if (root == null){
+            return res;
+        }
+        LinkedList<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            int count = queue.size();
+            List<Integer> list =new ArrayList<>();
+            while (count > 0){
+                TreeNode node = queue.poll();
+                list.add(node.val);
+                if (node.left != null){
+                    queue.add(node.left);
+                }
+                if (node.right != null){
+                    queue.add(node.right);
+                }
+                count --;
+            }
+            res.add(list);
+        }
+        return res;
+    }
+}
+```
+
+
+## 113. 路径总和 II
+
+### 题目描述
+
+给定一个二叉树和一个目标和，找到所有从根节点到叶子节点路径总和等于给定目标和的路径。
+
+**说明:** 叶子节点是指没有子节点的节点。
+
+**示例:**
+ 给定如下二叉树，以及目标和 `sum = 22`，
+
+```
+              5
+             / \
+            4   8
+           /   / \
+          11  13  4
+         /  \    / \
+        7    2  5   1
+```
+
+返回:
+
+```
+[
+   [5,4,11,2],
+   [5,8,4,5]
+]
+```
+
+### 分析
+
+
+
+### 贴出代码
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    List<List<Integer>> ans = new ArrayList<>();
+    public List<List<Integer>> pathSum(TreeNode root, int sum) {
+        if(root == null){
+            return ans;
+        }
+        List<Integer> tmp = new ArrayList<>();
+        findPath(root,sum,tmp);
+        return ans;
+    }
+
+    public void findPath(TreeNode root, int sum, List<Integer> tmp){
+        if(root == null){
+            return;
+        }
+        if(root.left == null && root.right == null && sum == root.val){
+            tmp.add(root.val);
+            ans.add(new ArrayList<Integer>(tmp));
+            tmp.remove(tmp.size() - 1);
+            return;
+        }
+        tmp.add(root.val);
+        findPath(root.left,sum - root.val, tmp);
+        findPath(root.right,sum - root.val, tmp);
+        tmp.remove(tmp.size() - 1);
+    }
+}
 ```
