@@ -4418,3 +4418,233 @@ class Solution {
     }
 }
 ```
+
+## 653. 两数之和 IV - 输入 BST
+
+### 题目描述
+
+给定一个二叉搜索树和一个目标结果，如果 BST 中存在两个元素且它们的和等于给定的目标结果，则返回 true。
+
+**案例 1:**
+
+```
+输入: 
+    5
+   / \
+  3   6
+ / \   \
+2   4   7
+
+Target = 9
+
+输出: True
+```
+
+ 
+
+**案例 2:**
+
+```
+输入: 
+    5
+   / \
+  3   6
+ / \   \
+2   4   7
+
+Target = 28
+
+输出: False
+```
+
+### 分析
+根据题目要求，要注意是两个元素的和构成目标数，不可以是一个元素自己等于目标数，或者一个元素自己加自己等于目标数。
+
+遍历树，对于每个子节点检查是否有另一个节点跟它的和为目标数。
+#### 复杂度分析
+时间复杂度 O(n2)
+空间复杂度 O(1)
+
+因为对于每个节点都要遍历一次树，所以时间复杂度比较高。
+### 贴出代码
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public boolean findTarget(TreeNode root, int k) {
+        return searchBST(root,root,k);
+    }
+
+    boolean searchBST(TreeNode root,TreeNode cur, int k){
+        if (cur == null){
+            return false;
+        }
+        TreeNode p = root;
+        while (p != null){
+            if (k == 2 * cur.val){
+                break;
+            }
+            if (k == cur.val + p.val){
+                return true;
+            }
+            if (k > cur.val + p.val){
+                p = p.right;
+            }else if (k < cur.val + p.val){
+                p = p.left;
+            }
+
+        }
+        return (searchBST(root,cur.left,k) || searchBST(root,cur.right,k));
+    }
+}
+```
+
+
+## 236. 二叉树的最近公共祖先
+
+### 题目描述
+
+给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+
+[百度百科](https://baike.baidu.com/item/最近公共祖先/8918834?fr=aladdin)中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（**一个节点也可以是它自己的祖先**）。”
+
+例如，给定如下二叉树:  root = [3,5,1,6,2,0,8,null,null,7,4]
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/15/binarytree.png)
+
+ 
+
+**示例 1:**
+
+```
+输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+输出: 3
+解释: 节点 5 和节点 1 的最近公共祖先是节点 3。
+```
+
+**示例 2:**
+
+```
+输入: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+输出: 5
+解释: 节点 5 和节点 4 的最近公共祖先是节点 5。因为根据定义最近公共祖先节点可以为节点本身。
+```
+
+ 
+
+**说明:**
+
+- 所有节点的值都是唯一的。
+- p、q 为不同节点且均存在于给定的二叉树中。
+
+### 分析
+1. root 的值等于 p 的值或者 q 的值这种时候直接返回 root 这个 node 就好了。
+2. root 的左边、右边都返回了一个node这种时候也是直接返回 root 就好了。
+3. root 的右边或者左边返回了一个node， 另一边的返回值是空的。
+   这种时候返回右边或者左边那个不是空的的node。
+4. 如果左边、右边的返回值都是空的
+   这就只好返回空的值了。
+5. （这个感觉应该放在最前面）如果连 root 都是空的话
+   也要返回空指针，这个应该是这一条路走到底的情况了。
+### 贴出代码
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (root == null){
+            return null;
+        }
+        if (root == p || root == q){
+            return root;
+        }
+
+        TreeNode left = lowestCommonAncestor(root.left,q,p);
+        TreeNode right = lowestCommonAncestor(root.right,q,p);
+        if (left != null && right != null){
+            return root;
+        }else if (left != null){
+            return left;
+        }else if (right != null){
+            return right;
+        }
+        return null;
+    }
+}
+```
+
+## 543. 二叉树的直径
+
+### 题目描述
+
+给定一棵二叉树，你需要计算它的直径长度。一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过根结点。
+
+**示例 :**
+ 给定二叉树
+
+```
+          1
+         / \
+        2   3
+       / \     
+      4   5    
+```
+
+返回 **3**, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
+
+**注意：**两结点之间的路径长度是以它们之间边的数目表示。
+
+### 分析
+感觉这个题最精髓的就是这两行代码了， 因为题目要求我们算的直径考虑的是最长的边，而不是最长的 path 的node数目，如果是统计最长的 path 的 node 数目，每次递归的时候加 1 就好了，但是因为这里算的是边长， 所以在走到叶子节点的时候统计的长度是 0， 如果不是叶子节点就是1加上下一层调用该函数的返回值。
+
+int left = dfs(root.left);
+int right = dfs(root.right);
+
+时间复杂度分析：o(n)
+### 贴出代码
+```java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+   int diameter;
+    public int diameterOfBinaryTree(TreeNode root) {
+        if (root == null){
+            return 0;
+        }
+        dfs(root);
+        return diameter - 1;
+    }
+
+    
+    private int dfs(TreeNode root){
+        if (root == null){
+            return 0;
+        }
+        int left = dfs(root.left);
+        int right = dfs(root.right);
+        diameter = Math.max(diameter,left + right + 1);
+        return Math.max(left,right) + 1;
+    }
+}
+```
