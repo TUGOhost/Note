@@ -1729,68 +1729,25 @@ class Solution {
 
 ```java
 class Solution {
-    private List<List<Integer>> res;
-    private List<Integer> list;
-    private int[] set;
-    private int num;
-
-
-    public List<List<Integer>> subsets(int[] nums){
-        res = new LinkedList<>();
-
-        if(nums != null){
-            list = new ArrayList<>();
-            quickSort(nums, 0, nums.length -1);
-            set = nums;
-            for(int i = 0; i <= nums.length; i++){
-                num = i;
-                subset(0);
-            }
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> subsets = new ArrayList<>();
+        List<Integer> tempSubset = new ArrayList<>();
+        for (int size = 0; size <= nums.length; size ++){
+            dfs(0,tempSubset,subsets,size,nums);
         }
-        set = null;
-        list = null;
-        return res;
+        return subsets;
     }
 
-    public void subset(int start){
-        if(num == 0){
-            List<Integer> tmp = new ArrayList<>();
-            for(Integer i : list){
-                tmp.add(i);
-            }
-            res.add(tmp);
+    private void dfs(int start,List<Integer> tempSubset,List<List<Integer>> subsets, final int size,final int[] nums){
+        if (tempSubset.size() == size){
+            subsets.add(new ArrayList<>(tempSubset));
             return;
         }
-        int endFirst = set.length - num;
-        for(int i = start; i <= endFirst; i++){
-            list.add(set[i]);
-            num--;
-            subset(i + 1);
-            num++;
-            list.remove(new Integer(set[i]));
+        for (int i = start;i < nums.length;i ++){
+            tempSubset.add(nums[i]);
+            dfs(i + 1,tempSubset,subsets,size,nums);
+            tempSubset.remove(tempSubset.size() - 1);
         }
-    }
-    private void quickSort(int[] arr, int lo,int hi){
-        if(lo < hi){
-            int mid = getMid(arr,lo,hi);
-            quickSort(arr,lo,mid -1);
-            quickSort(arr,mid + 1,hi);
-        }
-    }
-    private int getMid(int[] arr,int lo,int hi){
-        int tmp = arr[lo];
-        while(lo < hi){
-            while(lo < hi && arr[hi] > tmp){
-                hi--;
-            }
-            arr[lo] = arr[hi];
-            while(lo < hi && arr[lo] < tmp){
-                lo++;
-            }
-            arr[hi] = arr[lo];
-        }
-        arr[lo] = tmp;
-        return lo;
     }
 }
 ```
@@ -3571,33 +3528,32 @@ class Solution {
 ```java
 class Solution {
     public List<List<Integer>> combinationSum2(int[] candidates, int target) {
-        List<List<Integer>> res = new ArrayList<>();
-        if (candidates == null || candidates.length == 0 || target <= 0){
-            return res;
-        }
-        Arrays.sort(candidates);
-        dfs(res, new ArrayList<>(),candidates,target,0);
-        return res;
+    List<List<Integer>> combinations = new ArrayList<>();
+    Arrays.sort(candidates);
+    backtracking(new ArrayList<>(), combinations, new boolean[candidates.length], 0, target, candidates);
+    return combinations;
+}
+
+private void backtracking(List<Integer> tempCombination, List<List<Integer>> combinations,
+                          boolean[] hasVisited, int start, int target, final int[] candidates) {
+
+    if (target == 0) {
+        combinations.add(new ArrayList<>(tempCombination));
+        return;
     }
-
-    private void dfs(List<List<Integer>> res, List<Integer> temp, int[] candidates,int remind, int start){
-        if (remind < 0){
-            return;
+    for (int i = start; i < candidates.length; i++) {
+        if (i != 0 && candidates[i] == candidates[i - 1] && !hasVisited[i - 1]) {
+            continue;
         }
-        if (remind == 0){
-            res.add(temp);
-            return;
-        }
-
-        for (int i = start; i < candidates.length; i ++){
-            if (i > start && candidates[i] == candidates[i - 1]){
-                continue;
-            }
-            temp.add(candidates[i]);
-            dfs(res,new ArrayList<>(temp),candidates,remind - candidates[i],i + 1);
-            temp.remove(temp.size() - 1);
+        if (candidates[i] <= target) {
+            tempCombination.add(candidates[i]);
+            hasVisited[i] = true;
+            backtracking(tempCombination, combinations, hasVisited, i + 1, target - candidates[i], candidates);
+            hasVisited[i] = false;
+            tempCombination.remove(tempCombination.size() - 1);
         }
     }
+}
 }
 ```
 
