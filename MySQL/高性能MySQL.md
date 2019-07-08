@@ -1,6 +1,6 @@
 # MySQL架构与历史
 
-![](image/185.png)
+![](../image/185.png)
 
 MySQL服务器逻辑架构图
 

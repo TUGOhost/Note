@@ -1,5 +1,5 @@
 # 运行时数据区域
-![](../image/308.png)
+![](../../image/308.png)
 
 图中深色区域为，由所有线程共享的数据区域，其他为线程隔离的数据区。
 
@@ -39,20 +39,20 @@
 在两个对象出现循环引用的情况下，此时引用计数器永远不为0，导致无法对它们进行回收。正是因为循环引用的存在，因此Java虚拟机不使用引用计数算法。
 ```java
 public class ReferenceCountingGC{
-                  public Object intance = null;
-                  private static final int _1MB = 1024 * 1024;
-                  private byte[] bigSize = new byte[2 * _1MB];
-                  public static void testGC(){
-                              ReferenceCountingGC objA = new ReferenceCountingGC();
-                              ReferenceCountingGC objB = new ReferenceCountingGC();
-                              objA.instance = objB;
-                              objB.instance = objA;
+    public Object intance = null;
+    private static final int _1MB = 1024 * 1024;
+     private byte[] bigSize = new byte[2 * _1MB];
+    public static void testGC(){
+        ReferenceCountingGC objA = new ReferenceCountingGC();
+        ReferenceCountingGC objB = new ReferenceCountingGC();
+        objA.instance = objB;
+        objB.instance = objA;
 
-                              objA = null;
-                              objB = null;
+        objA = null;
+        objB = null;
 
-                              System.gc();    
-                  }
+        System.gc();    
+    }
 }
 ```
 
@@ -65,7 +65,7 @@ Java 虚拟机使用该算法来判断对象是否可被回收，GC Roots 一般
 - 方法区中类静态属性引用的对象
 - 方法区中的常量引用的对象
 
-![](image/309.png)
+![](../../image/309.png)
 
 ### 方法区的回收
 因为方法区主要存放永久代对象，而永久代对象的回收率比新生代低很多，所以在方法区上进行回收性价比不高。
@@ -121,7 +121,7 @@ obj = null;
 ## 垃圾收集算法
 
 ### 标记-清除
- ![](image/310.png)
+ ![](../../image/310.png)
 
 标记要回收的对象，然后清除。
 不足：
@@ -129,10 +129,10 @@ obj = null;
 - 会产生大量不连续的内存碎片，导致无法给大对象分配内存。
 
 ### 标记-整理
-![](image/311.png)
+![](../../image/311.png)
 让所有存活的对象都向一端移动，然后直接清理掉端边界以外的内存。
 ### 复制
-![](image/312.png)
+![](../../image/312.png)
 将内存划分为大小相等的两块，每次只使用其中一块，当这一块内存用完了就将还存活的对象复制到另一块上面，然后再把使用过的内存空间进行一次清理。
 
 主要不足是只使用了内存的一半。
@@ -148,7 +148,7 @@ HotSpot 虚拟机的 Eden 和 Survivor 大小比例默认为 8:1，保证了内�
 - 老年代使用：标记 - 清除 或者 标记 - 整理 算法
 
 ## 垃圾收集器
-![](image/313.png)
+![](../../image/313.png)
 以上是 HotSpot 虚拟机中的 7 个垃圾收集器，连线表示垃圾收集器可以配合使用。
 
 - 单线程与多线程：单线程指的是垃圾收集器只使用一个线程，而多线程使用多个线程；
@@ -157,7 +157,7 @@ HotSpot 虚拟机的 Eden 和 Survivor 大小比例默认为 8:1，保证了内�
 ### Serial收集器
 
 Serial收集器是最基本、历史最悠久的收集器，曾经（在JDK1.3.1之前）是虚拟机新生代收集的唯一选择。大家看名字就知道，这个收集器是单线程的收集器，但它的“单线程”的意义并不仅仅是说明它只会使用一个CPU或一条收集线程去完成垃圾收集工作，更重要的是在它进行垃圾收集时，必须暂停其他所有的工作线程（Sun将这件事情称之为“Stop The World”），直到它收集结束。"Stop The World"这个名字也许听起来很酷，但这项工作实际上是由虚拟机在后台自动发起和自动完成的，在用户不可见的情况下把用户的正常工作的线程全部停掉，这对很多应用来说都是难以接受的。你想，要是你的电脑每运行一个小时就会暂停响应5分钟，你会有什么样的心情？下图示意了Serial/Serial Old收集器的运行过程。	
-![](image/20.jpg)
+![](../../image/20.jpg)
 
 Serial 翻译为串行，也就是说它以串行的方式执行。
 它是单线程的收集器，只会使用一个线程进行垃圾收集工作。
@@ -168,7 +168,7 @@ Serial 翻译为串行，也就是说它以串行的方式执行。
 
 ParNew收集器其实就是Serial收集器的多线程版本，除了使用多线程进行垃圾收集之外，其余行为包括Serial收集器可用的所有控制参数（例如：-XX:SurvivorRatio、-XX:PretenureSizeThreshold、-XX:HandlePromotionFailure等）、收集算法、Stop The World、对象分配规则、回收策略等都与Serial收集器完全一样，实际上这两种收集器也共用了相当多的代码。ParNewS收集器的工作过程如图：
 
-![](image/21.jpg)
+![](../../image/21.jpg)
 
 它是 Server 场景下默认的新生代收集器，除了性能原因外，主要是因为除了 Serial 收集器，只有它能与 CMS 收集器配合使用。
 
@@ -222,7 +222,7 @@ CMS（Concurrent Mark Sweep）收集器是一种以获取最短回收停顿时�
 
 由于整个过程中耗时最长的并发标记和并发清除过程中，收集器线程都可以与用户线程一起工作，所以总体上来说，CMS收集器的内存回收过程与用户线程一起并发地执行地。通过下图可以比较清除地看到CMS收集器地运作步骤中并发和需要停顿地时间。
 
-![](image/161.png)
+![](../../image/161.png)
 
 CMS是一款优秀地收集器，它地最主要优点在名字上已经体现出来了：并发收集、低停顿，Sun的一些官方文档里面也称之为并发低停顿收集器（Concurrent Low Pause Collector）。但是CMS还远达不到完美的程度，它有以下三个显著的缺点：
 
@@ -284,7 +284,7 @@ G1收集器可以实现在基本不牺牲吞吐量地前提下完成低停顿的
 执行 CMS GC 的过程中同时有对象要放入老年代，而此时老年代空间不足（可能是 GC 过程中浮动垃圾过多导致暂时性的空间不足），便会报 Concurrent Mode Failure 错误，并触发 Full GC。
 
 # 类加载机制
-![](../image/314.png)
+![](../../image/314.png)
 包括以下 7 个阶段：
 - 加载（Loading）
 - 验证（Verification）
@@ -413,7 +413,7 @@ System.out.println(ConstClass.HELLOWORLD);
 应用程序是由三种类加载器互相配合从而实现类加载，除此之外还可以加入自己定义的类加载器。
 
 下图展示了类加载器之间的层次关系，称为双亲委派模型（Parents Delegation Model）。该模型要求除了顶层的启动类加载器外，其它的类加载器都要有自己的父类加载器。类加载器之间的父子关系一般通过组合关系（Composition）来实现，而不是继承关系（Inheritance）。
-![](../image/315.png)
+![](../../image/315.png)
 ### 工作过程
 一个类加载器首先将类加载请求转发到父类加载器，只有当父类加载器无法完成时才尝试自己加载。
 ### 好处
