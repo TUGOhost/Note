@@ -40,4 +40,4 @@
 - ##### 孤独星球:
   - [GitHub地址](https://github.com/TUGOhost/LonelyPlanet)
   - 开发时间: 2019.04
-  - 项目描述: 源自于宿舍小卖铺无法使用真实的支付功能，所以开发利用`websocket`通信的IM软件。使用`Netty`和`Spring Boot`开发的一款IM软件，使用`FastDFS`作为图片文件存储系统。已有聊天，添加好友，通过二维码添加好友等功能。
+  - 项目描述: 利用`websocket`通信的IM软件。使用`Netty`和`Spring Boot`开发的一款IM软件，使用`FastDFS`作为图片文件存储系统。已有聊天，添加好友，通过二维码添加好友等功能。
