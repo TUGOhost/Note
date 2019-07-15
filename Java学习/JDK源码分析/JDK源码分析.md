@@ -1,6 +1,6 @@
 # JDK版本
 
-![](../image/186.png)
+![](../../image/186.png)
 
 # ArrayList
 
@@ -2636,9 +2636,9 @@ ConcurrentHashMap是线程安全且高效的HashMap。
 
 ConcurrentHashMap是由Segment数组结构和HashEntry数据结构组成。Segment是一种可重入锁（ReentrantLock），在ConcurrentHashMap里扮演锁的角色；HashEntry则用于存储键值对数据。
 
-![](../image/255.png)
+![](../../image/255.png)
 
-![](../image/256.png)
+![](../../image/256.png)
 
 ### ConcurrentHashMap的操作
 
@@ -3449,7 +3449,8 @@ public static void main(String args[]){
 ```
 > 1、第三行和第四行没有任何区别，因为String.valueOf(i)也是调用Integer.toString(i)来实现的。 2、第二行代码其实是String i1 = (new StringBuilder()).append(i).toString();，首先创建一个StringBuilder对象，然后再调用append方法，再调用toString方法。
 
-# 参考链接
+## 参考链接
+
 - https://docs.oracle.com/javase/8/docs/api/java/lang/String.html
 - https://www.hollischuang.com/archives/99
 
@@ -3599,6 +3600,7 @@ String(char[] value, boolean share) {
 ## 概述
 `LinkedHashMap`是一个关联数组、哈希表，它是**线程不安全**的，允许**key为null,value为null**。他继承自`HashMap`，实现了`Map<K,V>`接口。其内部还维护了一个**双向链表**，在每次**插入数据，或者访问、修改数据**时，**会增加节点、或调整链表的节点顺序**。以决定迭代时输出的顺序。
 默认情况，遍历时的顺序是按照插入节点的顺序。这也是其与`HashMap`最大的区别。也可以在构造时传入`accessOrder`参数，使得其遍历顺序**按照访问的顺序**输出。
+
 ## 构造函数
 ```java
     //默认是false，则迭代时输出的顺序是插入节点的顺序。若为true，则输出的顺序是按照访问节点的顺序。
@@ -4146,10 +4148,9 @@ public boolean isEmpty() {
         return first() == null;
     }
 ```
+
 # BlockingQueue
 
 # ConcurrentSkipListMap
-
-# AbstractQueueSynchronizer
 
 # Atomic类

@@ -1,9 +1,74 @@
+# volatile的内存语义
+
+## volatile的特性
+
+理解volatile特性的一个好方法是把对volatile变量的单个读/写，堪称是使用同一个锁对这些单个读/写操作做了同步。
+
+锁的happens-before规则保证释放锁和获取锁的两个线程之间的内存可见性，这意味着对一个volatile变量的读，总是能看到（任意线程）对这个volatile变量最后的写入。
+
+锁的语义决定了临界区代码的执行具有原子性。即使是64位的long型和double型变量，只要它是volatile变量，对该变量的读/写就具有原子性。如果是多个volatile操作或类似于volatile++这种复合操作，这些操作整体上不具有原子性。
+
+volatile变量自身具有下列特性。
+
+- 可见性。对一个volatile变量的读，总是能看到（任意线程）对这个volatile变量最后的写入。
+- 原子性：对任意单个volatile变量的读/写具有原子性，但类似于volatile++这种复合操作不具有原子性。
+
+## volatile写-读的内存语义
+
+volatile写的内存语义如下。
+
+**当写一个volatile变量时，JMM会把该线程对应的本地内存中的共享变量值刷新到主内存。**
+
+volatile读的内存语义如下。
+
+**当读一个volatile变量时，JMM会把该线程对应的本地内存置为无效。线程接下来将从主内存中读取共享变量。**
+
+对volatile写和volatile读的内存语义做个总结。
+
+- 线程A写一个volatile变量，实质上是线程A向接下来将要读这个volatile变量的某个线程发出了（其对共享变量所做修改的）消息。
+- 线程B读一个volatile变量，实质上是线程B接受了之前某个线程发出的（在写这个volatile变量之前对共享变量所做的修改的）消息。
+- 线程A写一个volatile变量，随后线程B读这个volatile变量，这个过程实质上是线程A通过主内存线程B发送消息。
+
+![共享变量的状态示意图](../../image/421.png)
+
+## volatile内存语义的实现
+
+volatile重排序规则表
+
+![](../../image/422.png)
+
+从表中我们可以看出。
+
+- 当第二个操作是volatile写时，不管第一个操作是什么，都不能重排序。
+- 当第一个操作是volatile读时，不管第二个操作是什么，都不能重排序。
+- 当第一个操作是volatile写，第二个操作是volatile读时，不能重排序。
+
+保守策略下，volatile写插入内存屏障后生成的指令序列示意图：
+
+![](../../image/423.png)
+
+在保守策略下，volatile读插入内存屏障后生成的指令序列示意图：
+
+![](../../image/424.png)
+
+## JSR-133为什么要增强volatile的内存语义
+
+严格限制编译器和处理器对volatile变量与普通变量的重排序，确保volatile的写-读和锁的释放-获取具有相同的内存语义。
+
+在功能上，锁比volatile更强大；在可伸缩性和执行性能上，volatile更加优势。
+
+转载自[并发编程网 – ifeve.com](http://ifeve.com/)**参考链接地址:** [JSR133中文版](http://ifeve.com/jsr133-cn/)
+
+# 参考资料
+
+- [Java并发编程的艺术](https://book.douban.com/subject/26591326/)
+
 # volatile的应用
 
 在多线程并发编程中synchronized和volatile都扮演着重要的角色，volatile是轻量级的synchronized，它在多处理器开发中保证了共享变量的“可见性”。可见性的意思是当一个线程修改一个共享变量时，另外一个线程能读到这个修改的值。如果volatile变量修饰符使用恰当的话，它比synchronized的使用和执行成本更低，因为它不会引起线程上下文的切换和调度。
 
 ## 1.volatile的定义与实现原理
-  
+
 Java语言规范第3版中对volatile的定义如下：Java编程语言允许线程访问共享变量，为了确保共享变量能被准确和一致地更新，线程应该确保通过排他锁单独获得这个变量。Java语言提供了volatile，在某些情况下比锁要更加方便。如果一个字段被声明成volatile，Java线程内存模型确保所有线程看到这个变量的值是一致的。
 
 在了解volatile实现原理之前，我们先来看下与其实现原理相关的CPU术语与说明。
@@ -48,7 +113,7 @@ Java代码如下：
 
 ## 2.volatile的使用优化
 
-著名的Java并发编程大师Dourglea在JDK7的并发包里新增一个队列集合类LinkedTransferQueue，它在使用volatile变量时，用一种追加字节的方式来优化队列出队和入队的性能。LinkedTransferQueue的代码如下
+著名的Java并发编程大师Dourg Lea在JDK7的并发包里新增一个队列集合类LinkedTransferQueue，它在使用volatile变量时，用一种追加字节的方式来优化队列出队和入队的性能。LinkedTransferQueue的代码如下
 
 ```java
 //队列中的头部节点
