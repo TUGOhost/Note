@@ -69,7 +69,7 @@ main()的局部变量表存放对象的引用地址。
 
 ## 动态链接
 
-`动态链接`就是当我们这个程序运行main方法时，当执行math对象额compute方法时，去compute方法执行，compute方法算是符号引用，找到符号引用所在的方法体，执行。
+`动态链接`就是当我们这个程序运行main方法时，当执行math对象compute方法时，去compute方法执行，compute方法算是符号引用，找到符号引用所在的方法体，执行。
 
 执行`javap -v Math.class > Math.txt`得到字节码文件
 
@@ -154,3 +154,4 @@ public class HeapTest {
 ![](../../image/3.gif)
 
 如果老年代满了触发`Full GC`。如果`Full GC`对老年代没有用，即老年代中没有无用的对象时，出现OOM效果。
+
