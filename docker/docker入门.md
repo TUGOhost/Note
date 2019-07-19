@@ -253,7 +253,7 @@ volumes:
 > docker pull hub.c.163.com/library/redis:latest
 
 安装完成后，使用`docker images`命令，查看是否安装成功
-![](image/323.png)
+![](../image/323.png)
 
 ## Redis集群搭建
 ### 运行Redis镜像
@@ -263,12 +263,13 @@ volumes:
 > docker run --name redis-6381 -p 6381:6379 -d hub.c.163.com/library/redis
 
 使用`docker ps`命令，查看是否启动成功
-![](image/324.png)
+![](../image/324.png)
 
 ### 配置Redis集群
 分别使用`dokcer inspect 容器ID`命令，查看3个Redis内网IP地址
-![](image/325.png)
+![](../image/325.png)
 在Networks栏，可以看见该容器的Docker内网IP地址。
+
 > redis-6379：172.17.0.2:6379
 redis-6380：172.17.0.3:6379
 redis-6381：172.17.0.4:6379
@@ -285,7 +286,7 @@ redis-6381：172.17.0.4:6379
 > 分别在redis-6380和redis-6381使用 SLAVEOF 172.17.0.2 6379 命令
 在redis-6379 使用 info replication 命令，验证主从关系是否配置成功
 
-![](image/326.png)
+![](../image/326.png)
 这样，redis的集群环境就搭建好了，本机测试无问题，这里就不演示了。为了保证redis集群的高可用，下面开始配置redis哨兵模式。
 
 ## Redis哨兵模式

@@ -154,7 +154,7 @@ public class ReferenceCountingGC{
 
 如图所示，对象object 5、object 6、object 7虽然互相有关联，但是它们到GC Roots是不可达的，所以它们将会被判定为是否可回收的对象。
 
-![](image/19.jpg)
+![](../../image/19.jpg)
 
 在Java语言里，可作为GC Roots的对象包括下面几种：
 
