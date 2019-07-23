@@ -15,31 +15,36 @@
 - 熟悉基础数据结构与经典算法，计算机网络等基础知识。
 - 掌握`Java`基础，**多线程编程**，**集合框架**，网络编程。
 - 熟悉`JVM`虚拟机平台规范，**类加载机制**，**运行时数据区**，**GC垃圾回收机制**。
-- 掌握`Go`基础，**多线程编程**，**网络编程**。
 - 掌握**设计模式**，**面向对象**编程，研读过相关书籍，希望能够学以致用。
 - 热爱开源技术，熟悉`Spring MVC`/`MyBatis`等开源框架。
 - 深入研究过`Spring`技术栈，掌握`IOC`/`AOP`核心原理，研读过相关源代码。
 - 熟悉微服务架构，使用`Spring Cloud`/`Spring Boot`技术栈进行开发。
 - 熟练掌握`MySQL`，深入研究过`InnoDB`**存储引擎**，研读过相关书籍，数据库设计规范，能够对常见的`SQL`语句进行优化。
 - 熟练使用NoSQL数据库`Redis`，深入研究过Redis的**集群**，**读写分离**，**持久化**，数据类型以及应用场景。
-- 熟练使用`Docker`搭建相关集群。
-- 熟悉项目构建工具`MAVEN`，熟悉项目管理工具`Git`，熟悉`Linux`的常用操作。
+- 了解`HTML5`、`CSS6`和JavaScript`vue`等前端技术，并了解`Python`、`Go`基础。
+- 熟悉项目构建工具`MAVEN`，熟悉项目管理工具`Git`，熟悉`Linux`的常用操作，熟悉使用`Docker`容器搭建相关集群等。
 ---
 # 项目经历
 
  - ##### 宿舍小卖铺:
    - [GitHub地址](https://github.com/TUGOhost/DormitorySho)
    - 开发时间: 2018.08 - 2018.10
-- 项目描述: 该项目使用`Spring`和`SpringMVC`做Web后端框架，使用`Mybatis`作为SQL映射，使用`C3P0`做为后端连接池访问数据层，使用`MySQL`作为项目的数据层，使用`Redis`作为数据缓存层。
-  
+   - 项目描述: 该项目使用`SpringMVC`做Web后端框架；使用`MyBatis`访问数据库；使用`MySQL`作为项目的数据层；使用`Redis`作为数据缓存，并实现了分布式`Session`和分布式锁；`WebSocket`用于消息推送。
+   
 - ##### 孤独星球:
 
   - [GitHub地址](https://github.com/TUGOhost/LonelyPlanet)
   - 开发时间: 2019.04
-  - 项目描述: 该项目利用`websocket`通信的IM软件。使用`Netty`和`Spring Boot`开发的一款IM软件，使用`FastDFS`作为图片文件存储系统。已有聊天，添加好友，通过二维码添加好友等功能。
+  - 项目描述: 该项目利用`WebSocket`通信的IM软件。使用`Netty`实现网络协议；`Spring Boot`作为Web服务端；使用`FastDFS`作为图片文件存储系统。已有聊天，添加好友，通过二维码添加好友等功能。
 
 - ##### 乐优商城(微服务学习):
   - [GitHub地址](https://github.com/TUGOhost/leyou)
   - 开发时间: 2019.01 - 2019.03
   - 项目描述: 一套B2C的电商系统，使用`Spring Cloud`/`Spring Boot`作为微服务框架，使用了`Zuul`作为网关处理，`Eureka`作为注册中心用于注册服务和订阅服务，`Ribbon`作为负载均衡，`Hstix`作为失败容错，利用`RabbitMQ`作为消息队列作解耦；使用`MySQL`作为数据层的主数据库，使用`Redis`作为数据层的缓存使用，使用`FastDFS`作为图片文件存储系统。
+  
+- ##### 云盘
+
+  - [GitHub地址](https://github.com/TUGOhost/filestore-server)
+  - 开发时间：2019.06
+  - 项目描述: `net/http`实现文件上传服务；使用`Redis`存储文件分块信息，`Go`文件分块和文件合并，实现分块上传和断点续传；客户端计算文件hash，MySQL数据库分库分表，服务端判断/计算文件hash，实现秒传功能。
 
