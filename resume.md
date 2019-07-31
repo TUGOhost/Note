@@ -4,6 +4,7 @@
  - **Email**: tugohost@gmail.com
  - **个人博客**: https://www.cnblogs.com/Tu9oh0st/
  - **Github**: https://github.com/TUGOhost/
+ - **学校**: 宿州学院
  - **荣誉获奖**: 
    - 2017/05 2017年全国大学生安全与对抗技术个人挑战赛二等奖
    - 2017/10 2017年安徽省信息安全作品赛三等奖
