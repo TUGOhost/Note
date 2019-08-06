@@ -1,10 +1,12 @@
 # 个人信息
  - **姓名**: 刘雨
  - **手机**: 15555733491
- - **Email**: tugohost@gmail.com
+ - **Email**: tugohost@foxmail.com
  - **个人博客**: https://www.cnblogs.com/Tu9oh0st/
  - **Github**: https://github.com/TUGOhost/
- - **学校**: 宿州学院
+ - **教育经历:** 
+    - 学校: 宿州学院
+    - 专业: 软件工程
  - **荣誉获奖**: 
    - 2017/05 2017年全国大学生安全与对抗技术个人挑战赛二等奖
    - 2017/10 2017年安徽省信息安全作品赛三等奖
