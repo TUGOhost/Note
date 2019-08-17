@@ -29,7 +29,7 @@ sudo yum install jdk-8u181-linux-x64.rpm
 which java
 ```
 
-![](image/109.png)
+![](../image/109.png)
 
 继续,查看该软连接，链接位置
 
@@ -37,7 +37,7 @@ which java
 ls -ltr /usr/bin/java
 ```
 
-![](image/110.png)
+![](../image/110.png)
 
 从上面看，怎么看都不像JDK目录，那么可能还是软连接，继续查找
 
@@ -45,7 +45,7 @@ ls -ltr /usr/bin/java
 ls -lst /etc/alternatives/java
 ```
 
-![](image/111.png)
+![](../image/111.png)
 
 此目录 位置就是我们要要的JDK  JAVA 安装目录为(每个JDK的位置不一样的)
 
@@ -76,7 +76,7 @@ export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 
 然后输入`javac`看看是否出现如下
 
-![](image/112.png)
+![](../image/112.png)
 
 ### Maven安装
 
@@ -114,7 +114,7 @@ export PATH=$MAVEN_HOME/bin:$PATH
 . /etc/bashrc
 ```
 
-![](image/113.png)
+![](../image/113.png)
 
 #### Maven更改国内镜像设置
 

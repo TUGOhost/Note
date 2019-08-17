@@ -103,4 +103,4 @@ public class sendInlineMail {
 
 ## 效果展示：
 我用的我自己的QQ邮箱发给我的Gmail邮箱。
-![](image/307.png)
+![](../image/307.png)

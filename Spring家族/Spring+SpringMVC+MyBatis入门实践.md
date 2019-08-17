@@ -150,7 +150,7 @@ public class SpringTest {
 
 ```
 
-![](image/169.png)
+![](../image/169.png)
 
 ### 原理图
 以获取对象的方式来进行比较
@@ -228,7 +228,7 @@ Product p = (Product) context.getBean("p");
 ...
 ```
 
-![](image/170.png)
+![](../image/170.png)
 
 ## 注解方式IOC/DI
 
@@ -422,7 +422,7 @@ public class Category {
 
 运行测试类
 
-![](image/171.png)
+![](../image/171.png)
 
 ## AOP
 
@@ -444,7 +444,7 @@ public class Category {
 4. 如果有需要，就把"日志输出" 功能和 "登陆" 功能 **编织**在一起，这样登陆的时候，就可以看到日志输出了
 5. 辅助功能，又叫做**切面**，这种能够**选择性的，低耦合的**把切面和核心业务功能结合在一起的编程思想，就叫做切面编程
 
-![](image/23.jpg)
+![](../image/23.jpg)
 
 1. 准备业务类ProductService
 
@@ -536,7 +536,7 @@ public class LoggerAspect {
 
 6. 运行测试类
 
-![](image/173.png)
+![](../image/173.png)
 
 ## 注解方式AOP
 
@@ -580,7 +580,7 @@ public class LoggerAspect {
 
 2. 运行测试类
 
-![](image/174.png)
+![](../image/174.png)
 
 ## 注解方式测试
 
@@ -789,7 +789,7 @@ public class SpringTest {
         控制类 IndexController实现接口Controller ，提供方法handleRequest处理请求
 
       SpringMVC通过 ModelAndView 对象把模型和视图结合在一起
-    
+        
       > ```jsp
       > ModelAndView mav = new ModelAndView("index.jsp");
       > mav.addObject("message","Hello SpringMVC!");
@@ -829,7 +829,7 @@ public class SpringTest {
 4.  在IndexController中指定跳转到页面index.jsp，并传递message数据
 5.  在index.jsp中显示message信息
 
-![](image/24.jpg)
+![](../image/24.jpg)
 
 ### 练习
 
@@ -1741,7 +1741,7 @@ public class TestMybatis {
     2.4 把多个Category对象装在一个Category集合中
 3. 返回一个Category集合
 
-![](image/25.jpg)
+![](../image/25.jpg)
 
 ### 练习
 
@@ -2319,7 +2319,7 @@ OrderItem.xml
 
 查询结果 id和code字段放在Order对象里， 然后通过一对多的<collection>标签把oiid和number放在OrderItem对象里，最后把pid,pname,price放进Product对象里。
 
-![](image/176.png)
+![](../image/176.png)
 
 ```java
 //测试类
@@ -2378,7 +2378,7 @@ addOrderItem调用insert into 语句插入一条OrderItem记录
 
 
 
-![](image/177.png)
+![](../image/177.png)
 
 ```java
 //测试类
@@ -2412,7 +2412,7 @@ public void addOrderItem(SqlSession session){
 删除关系的时候，通过订单id(1)和产品id(6)进行删除。
 其实所谓的删除关系，就是删除掉OrderItem记录。
 
-![](image/178.png)
+![](../image/178.png)
 
 ```java
 //测试类
@@ -2781,7 +2781,7 @@ Mybatis里面没有else标签，但是可以使用when otherwise标签来达到�
 foreach标签通常用于in 这样的语法里，参考 [Oracle的in语法](http://how2j.cn/k/oracle/oracle-where/218.html#step396) 。
 如例，如图查询出id等于1,3,5的数据出来.
 
-![](image/180.png)
+![](../image/180.png)
 
 ```xml
 <select id="listProduct" resultType="Product">
@@ -3255,9 +3255,9 @@ public class TestMybatis {
 
 ## 用IDEA搭建SSM环境
 
-![](image/181.png)
+![](../image/181.png)
 
-![](image/182.png)
+![](../image/182.png)
 
 next
 
@@ -3796,7 +3796,7 @@ public class CategoryController {
 8. 在listCategory方法中，访问CategoryService,并获取数据，并把数据放在"cs"上，接着服务端跳转到listCategory.jsp去
 9. 最后在listCategory.jsp 中显示数据
 
-![](image/26.jpg)
+![](../image/26.jpg)
 
 ## 分页
 
@@ -4600,10 +4600,10 @@ SpringMVC 只能处理post和get,为了还原对put和delete的处理，web.xml�
 
 listCategory.jsp 做了如下修改
 1. 增加
-  action修改为"categories"
+    action修改为"categories"
 2. 删除
-  2.1 url修改为categories/id
-  2.2 点击超链后，会使用form提交，并且提交_method的值为delete, 这样在 springmvc得到后，就会以 method=delete 处理了。
+    2.1 url修改为categories/id
+    2.2 点击超链后，会使用form提交，并且提交_method的值为delete, 这样在 springmvc得到后，就会以 method=delete 处理了。
 
 ```javascript
 $(function(){                     
