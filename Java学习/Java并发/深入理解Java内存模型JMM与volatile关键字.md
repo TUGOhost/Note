@@ -53,9 +53,7 @@ public class VolatileVisibilityTest {
 
 并未出现
 
-> ```
 > ============数据准备完毕，执行程序逻辑
-> ```
 
 这段结果
 
