@@ -234,7 +234,7 @@ public class InterfaceImplementExample implements InterfaceExample {
 ### static
 
 ## 反射
-![](/image/Java反射机制.png)
+![](../image/Java反射机制.png)
 
 ## 反射是什么
 
@@ -666,13 +666,13 @@ Process finished with exit code 0
 
 ```
 
-![](/image/125.png)
+![](../image/125.png)
 
 `不积跬步无以至千里`
 
 ## 思维导图
 
-![](/image/17.jpg)
+![](../image/17.jpg)
 
 扩展阅读：
 
@@ -1119,7 +1119,7 @@ public void validateValues() throws @Critical ValidationFailedException{
 
 ### 思维导图
 
-![](/image/18.jpg)
+![](../image/18.jpg)
 
 ### 扩展阅读
 
