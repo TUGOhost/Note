@@ -28,6 +28,16 @@ $ python -m userpath append ~/.local/bin
 $ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 ```
 
+针对frida 12.8.0版本的安装
+
+这个版本可能是比较稳定的：
+
+> pip install frida==12.8.0 
+>
+> pip install frida-tools==5.3.0 
+>
+> pip install objection==1.8.4
+
 ## 新建一个Android项目
 
 ```java

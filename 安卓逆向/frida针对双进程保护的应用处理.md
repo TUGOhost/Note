@@ -1,0 +1,1 @@
+最近逆向分析几个app，但是有几个有双进程，也就是执行`frida-ps -U | grep packname`会有两个进程id。可以试试ZenTracer。
