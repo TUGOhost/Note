@@ -175,11 +175,8 @@ docker容器里执行`mount system.img system/` 会提示  `mount: system/: moun
 回到源代码的根目录中执行`extract-files.sh`
 
 > ./extract-files.sh ~/android/system_dump/
->
-> ```
 > sudo umount -R ~/android/system_dump/system/
 > rm -rf ~/android/system_dump/
-> ```
 
 **[100% 139/139] out/soong/.bootstrap/bin/soong_build out/soong/build.ninja** 
 FAILED: out/soong/build.ninja 
@@ -203,10 +200,8 @@ up root-level access to files
 
 \#### failed to build some targets (32 seconds) ####
 
-> ```
 > croot
 > brunch sailfish
-> ```
 
 ## 参考
 
