@@ -12,3 +12,4 @@ https://wiki.winehq.org/Ubuntu_zhcn
 
 ## wine安装ida
 
+wine ida64.exe
